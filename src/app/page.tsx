@@ -82,8 +82,11 @@ export default function Home() {
             href="/links"
             className="group inline-flex items-center gap-1 font-mono text-sm text-text-muted transition-colors hover:text-text-primary"
           >
-            all links
-            <ArrowUpRight size={14} className="transition-colors group-hover:text-text-primary" />
+            my links
+            <ArrowUpRight
+              size={14}
+              className="transition-colors group-hover:text-text-primary"
+            />
           </Link>
         </div>
       </header>
