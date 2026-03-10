@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm run:*)",
+      "Bash(sed -i '' 's/title: \"\"Work — Rose Kamal Love\"\"/title: \"\"Work\"\"/' /Users/rosekamallove/dev/rosekamal.com/src/app/work/page.tsx)",
+      "Bash(sed -i '' 's/title: \"\"Projects — Rose Kamal Love\"\"/title: \"\"Projects\"\"/' /Users/rosekamallove/dev/rosekamal.com/src/app/projects/page.tsx)",
+      "Bash(sed -i '' 's/title: \"\"Writing — Rose Kamal Love\"\"/title: \"\"Writing\"\"/' /Users/rosekamallove/dev/rosekamal.com/src/app/writing/page.tsx)",
+      "Bash(sed -i '' 's/title: \"\"Outside Work — Rose Kamal Love\"\"/title: \"\"Outside Work\"\"/' /Users/rosekamallove/dev/rosekamal.com/src/app/outside/page.tsx)"
     ]
   }
 }
