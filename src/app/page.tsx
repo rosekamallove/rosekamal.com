@@ -1,20 +1,46 @@
 import Link from "next/link";
-import { ArrowUpRight, Mail, Linkedin, Github, MapPin, Instagram, YouTube, XTwitter } from "@/components/icons";
+import {
+  ArrowUpRight,
+  Mail,
+  Linkedin,
+  Github,
+  MapPin,
+  Instagram,
+  YouTube,
+  XTwitter,
+} from "@/components/icons";
 
 const SOCIAL_LINKS = [
   { label: "Email", href: "mailto:rosekamallove@gmail.com", icon: Mail },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/rose-kamal-love-1146141b0/", icon: Linkedin },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/rose-kamal-love-1146141b0/",
+    icon: Linkedin,
+  },
   { label: "GitHub", href: "https://github.com/rosekamallove", icon: Github },
   { label: "X", href: "https://x.com/rosekamallove", icon: XTwitter },
-  { label: "Instagram", href: "http://instagram.com/rosekamallove", icon: Instagram },
-  { label: "YouTube", href: "https://www.youtube.com/@rosekamallove", icon: YouTube },
+  {
+    label: "Instagram",
+    href: "http://instagram.com/rosekamallove",
+    icon: Instagram,
+  },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/@rosekamallove",
+    icon: YouTube,
+  },
 ];
 
 const PAGE_LINKS = [
   { href: "/work", label: "work", desc: "experience & career", span: 1 },
   { href: "/projects", label: "projects", desc: "things i've built", span: 2 },
   { href: "/writing", label: "writing", desc: "essays & thoughts", span: 2 },
-  { href: "/outside", label: "outside work", desc: "guitar, piano, photography", span: 1 },
+  {
+    href: "/outside",
+    label: "outside work",
+    desc: "guitar, piano, photography",
+    span: 1,
+  },
 ];
 
 export default function Home() {
@@ -44,27 +70,21 @@ export default function Home() {
         </p>
 
         <p className="animate-fade-in stagger-3 mb-8 max-w-lg text-base leading-relaxed text-text-secondary">
-          Product Lead at{" "}
-          <span className="text-text-primary">OptimizeCX</span>, working on
-          InstantDocs. Previously co-founded{" "}
+          Product Lead at <span className="text-text-primary">OptimizeCX</span>,
+          working on InstantDocs. Previously co-founded{" "}
           <span className="text-text-primary">Kroto</span> — raised $160K,
           launched #1 on Product Hunt, and got acquired. I build software people
           actually use.
         </p>
 
-        <div className="animate-fade-in stagger-4 flex gap-3">
-          {SOCIAL_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target={link.href.startsWith("mailto") ? undefined : "_blank"}
-              rel="noopener noreferrer"
-              aria-label={link.label}
-              className="group flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg-card transition-all hover:border-border-hover hover:bg-bg-card-hover"
-            >
-              <link.icon />
-            </a>
-          ))}
+        <div className="animate-fade-in stagger-4">
+          <Link
+            href="/links"
+            className="group inline-flex items-center gap-1 font-mono text-sm text-text-muted transition-colors hover:text-text-primary"
+          >
+            all links
+            <ArrowUpRight size={14} className="transition-colors group-hover:text-text-primary" />
+          </Link>
         </div>
       </header>
 
@@ -80,7 +100,10 @@ export default function Home() {
             <span className="font-medium">{item.label}</span>
             <div className="flex items-center justify-between">
               <span className="text-sm text-text-muted">{item.desc}</span>
-              <ArrowUpRight size={15} className="text-text-muted transition-colors group-hover:text-text-primary" />
+              <ArrowUpRight
+                size={15}
+                className="text-text-muted transition-colors group-hover:text-text-primary"
+              />
             </div>
           </Link>
         ))}
