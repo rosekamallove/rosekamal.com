@@ -66,7 +66,7 @@ export default function Home() {
         </h1>
 
         <p className="animate-fade-in stagger-2 mb-4 font-mono text-sm text-text-muted">
-          Founder, builder, product engineer.
+          Founder, builder.
         </p>
 
         <p className="animate-fade-in stagger-3 mb-8 max-w-lg text-base leading-relaxed text-text-secondary">
