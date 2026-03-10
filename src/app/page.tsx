@@ -4,9 +4,14 @@ import {
   Linkedin,
   Github,
   MapPin,
+  Guitar,
+  Piano,
+  Camera,
 } from "@/components/icons";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const NAV_LINKS = [
+  { label: "Projects", href: "#projects" },
   { label: "Experience", href: "#experience" },
   { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
@@ -27,6 +32,33 @@ const SOCIAL_LINKS = [
     label: "GitHub",
     href: "https://github.com/rosekamallove",
     icon: Github,
+  },
+];
+
+type ProjectStatus = "active" | "shipped" | "archived";
+
+const PROJECTS: {
+  name: string;
+  description: string;
+  url?: string;
+  tech: string[];
+  status: ProjectStatus;
+}[] = [
+  {
+    name: "InstantDocs",
+    description:
+      "AI-powered video documentation for SaaS products. Auto-generates professional step-by-step guides from screen recordings in minutes.",
+    url: "https://instantdocs.app",
+    tech: ["Next.js", "TypeScript", "OpenAI", "FFmpeg"],
+    status: "active",
+  },
+  {
+    name: "Kroto",
+    description:
+      "AI course builder for creators — scaled to 500+ courses and 30 paying creators before pivoting to product documentation and getting acquired.",
+    url: "https://kroto.in",
+    tech: ["React", "Node.js", "PostgreSQL", "AWS"],
+    status: "shipped",
   },
 ];
 
@@ -121,13 +153,19 @@ const EXPERIENCE = [
   },
 ];
 
+const HOBBIES = [
+  { icon: Guitar, label: "Guitar", note: "acoustic & electric" },
+  { icon: Piano, label: "Piano", note: "learning" },
+  { icon: Camera, label: "Photography", note: "street & portraits" },
+];
+
 export default function Home() {
   return (
     <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24">
       {/* ── Nav ── */}
       <nav className="animate-fade-in mb-16 flex items-center justify-between">
         <span className="font-mono text-sm text-text-muted">rkl</span>
-        <div className="flex gap-6">
+        <div className="flex items-center gap-6">
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -137,6 +175,7 @@ export default function Home() {
               {link.label}
             </a>
           ))}
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -148,8 +187,8 @@ export default function Home() {
           <span className="mx-1 text-text-muted">/</span>
           <span className="inline-flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-yellow" />
             </span>
             Available
           </span>
@@ -188,10 +227,20 @@ export default function Home() {
         <div className="rounded-xl border border-border bg-bg-card p-5">
           <p className="text-sm leading-relaxed text-text-secondary">
             Leading product and shipping as an IC on{" "}
-            <span className="text-text-primary font-medium">InstantDocs</span>{" "}
+            <span className="font-medium text-text-primary">InstantDocs</span>{" "}
             at OptimizeCX — the evolution of Kroto after its acquisition.
             Building the future of product documentation.
           </p>
+        </div>
+      </section>
+
+      {/* ── Projects ── */}
+      <section id="projects" className="animate-fade-in stagger-6 mb-20">
+        <SectionHeading label="Projects" />
+        <div className="space-y-1">
+          {PROJECTS.map((project, i) => (
+            <ProjectCard key={i} {...project} />
+          ))}
         </div>
       </section>
 
@@ -216,6 +265,16 @@ export default function Home() {
           <p className="mt-0.5 font-mono text-xs text-text-muted">
             2020 - 2024
           </p>
+        </div>
+      </section>
+
+      {/* ── Outside Work ── */}
+      <section className="animate-fade-in stagger-7 mb-20">
+        <SectionHeading label="Outside Work" />
+        <div className="grid grid-cols-3 gap-3">
+          {HOBBIES.map((h) => (
+            <HobbyCard key={h.label} {...h} />
+          ))}
         </div>
       </section>
 
@@ -271,6 +330,74 @@ function SectionHeading({ label }: { label: string }) {
   );
 }
 
+function ProjectCard({
+  name,
+  description,
+  url,
+  tech,
+  status,
+}: {
+  name: string;
+  description: string;
+  url?: string;
+  tech: string[];
+  status: ProjectStatus;
+}) {
+  const statusConfig: Record<
+    ProjectStatus,
+    { label: string; className: string }
+  > = {
+    active: { label: "Active", className: "text-yellow bg-yellow/10" },
+    shipped: {
+      label: "Shipped",
+      className: "text-text-secondary bg-bg-card-hover",
+    },
+    archived: {
+      label: "Archived",
+      className: "text-text-muted bg-bg-card-hover",
+    },
+  };
+  const { label, className: statusClass } = statusConfig[status];
+
+  const inner = (
+    <div className="group rounded-xl border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="font-medium">{name}</h3>
+          <span
+            className={`rounded-full px-2 py-0.5 font-mono text-xs ${statusClass}`}
+          >
+            {label}
+          </span>
+        </div>
+        {url && <ArrowUpRight size={15} />}
+      </div>
+      <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+        {description}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {tech.map((t) => (
+          <span
+            key={t}
+            className="rounded-md border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
+          >
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (url) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+        {inner}
+      </a>
+    );
+  }
+  return inner;
+}
+
 function ExperienceCard({
   title,
   company,
@@ -319,12 +446,34 @@ function ExperienceCard({
         <ul className="mt-3 space-y-1.5">
           {highlights.map((item, i) => (
             <li key={i} className="flex gap-2 text-sm text-text-secondary">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-green" />
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-yellow" />
               {item}
             </li>
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function HobbyCard({
+  icon: Icon,
+  label,
+  note,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  note?: string;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-bg-card px-4 py-5 text-center">
+      <Icon size={22} className="text-text-secondary" />
+      <div>
+        <p className="text-sm font-medium">{label}</p>
+        {note && (
+          <p className="mt-0.5 font-mono text-xs text-text-muted">{note}</p>
+        )}
+      </div>
     </div>
   );
 }

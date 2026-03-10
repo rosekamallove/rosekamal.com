@@ -100,3 +100,105 @@ export function ArrowUpRight({ size = defaultSize, className }: IconProps) {
     </svg>
   );
 }
+
+export function Sun({ size = defaultSize, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "text-text-secondary transition-colors"}
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+    </svg>
+  );
+}
+
+export function Moon({ size = defaultSize, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "text-text-secondary transition-colors"}
+    >
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
+export function Guitar({ size = defaultSize, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "text-text-secondary"}
+    >
+      <path d="m11.9 12.1-5.4 5.4a2.12 2.12 0 1 1-3-3l5.4-5.4" />
+      <path d="M14.3 9.7a2.5 2.5 0 0 0-3.5-3.5L9 8l3.5 3.5 1.8-1.8Z" />
+      <path d="m16 6 1-1 1.5 1.5L20 5l-1-1 1-1-1.5-1.5-1 1-1-1-1.5 1.5 1 1-3 3" />
+      <circle cx="9.5" cy="14.5" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function Piano({ size = defaultSize, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "text-text-secondary"}
+    >
+      <rect x="2" y="5" width="20" height="15" rx="1.5" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <line x1="7" y1="5" x2="7" y2="12" />
+      <line x1="12" y1="5" x2="12" y2="12" />
+      <line x1="17" y1="5" x2="17" y2="12" />
+      <rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
+      <rect x="9.5" y="5" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
+      <rect x="14.5" y="5" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function Camera({ size = defaultSize, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "text-text-secondary"}
+    >
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+      <circle cx="12" cy="13" r="3" />
+    </svg>
+  );
+}
