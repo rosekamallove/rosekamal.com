@@ -1,0 +1,52 @@
+---
+title: "Hello, World"
+description: "First post — how this blog works and what to expect."
+date: "2026-03-12"
+tags: ["meta", "writing"]
+---
+
+This is the first post on my site. It exists mostly to make sure everything works.
+
+## How posts are structured
+
+Posts live in `content/blog/` as `.mdx` files. Frontmatter handles the metadata:
+
+```yaml
+title: "Post title"
+description: "One-line summary — used for the listing and SEO"
+date: "YYYY-MM-DD"
+tags: ["optional", "tags"]
+draft: true  # omit or set false to publish
+```
+
+## Mermaid diagrams
+
+You can include diagrams using fenced code blocks with the `mermaid` language tag:
+
+```mermaid
+graph TD
+  A[Write post] --> B[Drop .mdx in content/blog/]
+  B --> C{Has mermaid?}
+  C -->|yes| D[Renders client-side]
+  C -->|no| E[Static at build time]
+  D --> F[Ship it]
+  E --> F
+```
+
+## Markdown features
+
+**Bold**, _italic_, `inline code`, and [links](https://rosekamal.com) all work.
+
+> Blockquotes too.
+
+Tables via GitHub Flavored Markdown:
+
+| Frontmatter field | Required | Notes                    |
+| ----------------- | -------- | ------------------------ |
+| title             | yes      |                          |
+| description       | yes      | Used in listing + OG     |
+| date              | yes      | ISO format `YYYY-MM-DD`  |
+| tags              | no       | Array of strings         |
+| draft             | no       | Hides from listing       |
+
+That's it. Write and ship.
