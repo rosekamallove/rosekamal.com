@@ -37,7 +37,7 @@ export default function WritingPage() {
                 className="group flex items-start justify-between gap-4 rounded-lg border border-transparent px-1 py-3 transition-colors hover:border-border hover:bg-bg-card"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-text-primary transition-colors group-hover:text-yellow">
+                  <p className="text-sm font-medium text-text-primary">
                     {post.title}
                   </p>
                   {post.description && (

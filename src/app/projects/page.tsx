@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
 import { SectionHeading } from "@/components/SectionHeading";
 
@@ -9,27 +10,37 @@ export const metadata: Metadata = {
 
 type ProjectStatus = "active" | "shipped" | "archived" | "acquired";
 
-const PROJECTS: {
+type Project = {
   name: string;
   description: string;
   url?: string;
-  tech: string[];
   status: ProjectStatus;
-}[] = [
+};
+
+const PINNED: Project[] = [];
+
+const EXPERIMENTS: Project[] = [
   {
-    name: "InstantDocs",
+    name: "Autonomous Email Reply Agent",
     description:
-      "AI-powered video documentation for SaaS products. Auto-generates professional step-by-step guides from screen recordings in minutes.",
-    url: "https://app.instantdocs.com",
-    tech: ["Next.js", "TypeScript", "OpenAI", "FFmpeg"],
+      "Reads inbound cold outreach replies, classifies intent, drafts a response, has another model peer-review the draft, then sends — no human in the loop.",
+    url: "/writing/building-a-multi-agent-email-reply-system",
     status: "active",
   },
+  {
+    name: "YouTube",
+    description: "Videos about building with AI — agents, real systems, and what actually works in production.",
+    url: "https://www.youtube.com/@rosekamallove",
+    status: "active",
+  },
+];
+
+const PAST: Project[] = [
   {
     name: "Kroto",
     description:
       "AI course builder for creators — scaled to 500+ courses and 30 paying creators before pivoting to product documentation and getting acquired.",
-    url: "https://kroto.one",
-    tech: ["React", "Node.js", "PostgreSQL", "AWS"],
+    url: "https://app.instantdocs.com",
     status: "acquired",
   },
 ];
@@ -38,12 +49,27 @@ export default function ProjectsPage() {
   return (
     <section>
       <SectionHeading label="projects" />
+      <div className="space-y-8">
+        {PINNED.length > 0 && <Group projects={PINNED} />}
+        <Group label="experiments" projects={EXPERIMENTS} />
+        <Group label="past" projects={PAST} />
+      </div>
+    </section>
+  );
+}
+
+function Group({ label, projects }: { label?: string; projects: Project[] }) {
+  return (
+    <div>
+      {label && (
+        <p className="mb-2 font-mono text-xs text-text-muted">{label}</p>
+      )}
       <div className="space-y-1">
-        {PROJECTS.map((project, i) => (
+        {projects.map((project, i) => (
           <ProjectCard key={i} {...project} />
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -51,15 +77,8 @@ function ProjectCard({
   name,
   description,
   url,
-  tech,
   status,
-}: {
-  name: string;
-  description: string;
-  url?: string;
-  tech: string[];
-  status: ProjectStatus;
-}) {
+}: Project) {
   const statusConfig: Record<
     ProjectStatus,
     { label: string; className: string }
@@ -96,24 +115,19 @@ function ProjectCard({
       <p className="mt-2 text-sm leading-relaxed text-text-secondary">
         {description}
       </p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {tech.map((t) => (
-          <span
-            key={t}
-            className="rounded-md border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
-          >
-            {t}
-          </span>
-        ))}
-      </div>
     </div>
   );
 
   if (url) {
-    return (
+    const isExternal = url.startsWith("http");
+    return isExternal ? (
       <a href={url} target="_blank" rel="noopener noreferrer" className="block">
         {inner}
       </a>
+    ) : (
+      <Link href={url} className="block">
+        {inner}
+      </Link>
     );
   }
   return inner;
