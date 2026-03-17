@@ -1,0 +1,63 @@
+---
+title: "I Tested Claude Code and Codex on REAL WORLD Tasks — Here's What I Learned"
+description: "I put Claude Code and Codex head-to-head on 4 actual tasks from my job. The results weren't even close."
+date: "2026-03-05"
+tags: ["vibe coding", "claude", "codex", "ai", "engineering"]
+---
+
+Codex and Claude Code have been making a lot of noise lately. Instead of running generic benchmarks, I decided to test them using four real-world tasks I actually had to do last week. 
+
+The tasks start out easy and get progressively harder. Here is how it went down. 
+
+*(You can watch the full video of this test [here](https://youtu.be/AqewRTSnFEM))*
+
+## Round 1: Resume to Website
+
+For the first task, all the agent had to do was take my resume (a PDF) and create a very simple website.
+
+**Codex:** It looked pretty fucking good, honestly. But it wasn't as minimal as I was going for, and it hallucinated some random ass statistics that I didn't want. 9/10.
+
+**Claude Code:** First off, I love that Claude actually asked for permission to edit code in the session and ran `npm install` itself. The output? Wow. It went with a dark theme and a clean Vercel aesthetic, which I really liked. More importantly, it didn't create fake stats. 10/10. 
+
+**Winner:** Claude.
+
+## Round 2: Existing Codebase UI Update
+
+This one is harder. The agent had to jump into an existing codebase, understand the nested components, and change the UI. Specifically, I needed some UI changes on the analytics page for GrooveHQ.
+
+The goal: follow my instructions and give me a commit-ready output.
+
+**Codex:** Took so long I was falling asleep. When it finally finished, it fucked up the percentages. If the previous value is 0, it should show a 100% increase. Codex just showed 100%. A percentage number should never overflow like that—it's very dumb. 
+
+**Claude Code:** Handled the math correctly (showed the 100% increase), but it completely ignored my instructions on styling. It added random green and red backgrounds automatically. 
+
+**Winner:** Tie. Both fucked up one thing, but I'd lean Claude because Codex's math error would cause serious overflow issues at scale.
+
+## Round 3: Comprehensive QA Test Plan
+
+This task was extremely context-heavy. The agents had to scan the entire codebase (over 10,000 commits, hundreds of thousands of lines) and create a list of modules for our testing team. I told them to scan the schema, then the router, then the main front-end layout.
+
+**Codex:** Right off the bat, it messed up. It decided to just skim the key dashboard setting pages and skipped the deep dive, asking me what to prioritize. The output was pretty shitty—neither wide nor deep. For our main knowledge base feature, it gave me a measly 10 test cases.
+
+**Claude Code:** Absolute dominance. It generated a comprehensive manual QA test plan as a markdown file with over 200 test cases organized across 22 feature areas. For the knowledge base alone, it mapped out 13 submodules.
+
+**Winner:** Claude.
+
+## Round 4: The Ultimate Refactor
+
+This is the ultimate test for any AI coding agent because it's almost entirely reasoning-based. The task: refactor a 5,000+ line React component to improve readability and interoperability so new devs don't do more damage than good when touching it.
+
+**Codex:** Did about 2,000 lines of changes. It abstracted a bunch of lines into a single function and renamed some things. In isolation, it was fine.
+
+**Claude Code:** Before writing code, it gave me a highly detailed plan. It actually understood how components and hooks were structured. 
+
+```mermaid
+graph TD
+  A[5,000+ Line React Page] --> B[Claude Code Context Analysis]
+  B --> C[Detailed Refactor Plan]
+  C --> D[12 New Components]
+  C --> E[3 New Hooks]
+  C --> F[1 Constants File]
+  D --> G[Slimmed Down, Scalable Page]
+  E --> G
+  F --> G
