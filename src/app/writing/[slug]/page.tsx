@@ -23,6 +23,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      url: `https://rosekamal.com/writing/${slug}`,
+      siteName: "Rose Kamal Love",
+      publishedTime: new Date(post.date).toISOString(),
+      authors: ["Rose Kamal Love"],
+      tags: post.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      creator: "@rosekamallove",
+    },
   };
 }
 
@@ -37,8 +53,23 @@ export default async function PostPage({ params }: Props) {
     day: "numeric",
   });
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description,
+    datePublished: new Date(post.date).toISOString(),
+    dateModified: new Date(post.date).toISOString(),
+    author: { "@type": "Person", name: "Rose Kamal Love", url: "https://rosekamal.com" },
+    publisher: { "@type": "Person", name: "Rose Kamal Love", url: "https://rosekamal.com" },
+    url: `https://rosekamal.com/writing/${post.slug}`,
+    mainEntityOfPage: { "@type": "WebPage", "@id": `https://rosekamal.com/writing/${post.slug}` },
+    ...(post.tags?.length && { keywords: post.tags.join(", ") }),
+  };
+
   return (
     <article>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <div className="mb-8">
         <Link
           href="/writing"

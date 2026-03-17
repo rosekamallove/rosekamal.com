@@ -38,6 +38,23 @@ export const metadata: Metadata = {
 
 const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`;
 
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Rose Kamal Love",
+  url: "https://rosekamal.com",
+  jobTitle: "Product Lead",
+  worksFor: { "@type": "Organization", name: "OptimizeCX" },
+  address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },
+  sameAs: [
+    "https://x.com/rosekamallove",
+    "https://github.com/rosekamallove",
+    "https://www.linkedin.com/in/rose-kamal-love-1146141b0/",
+    "https://www.youtube.com/@rosekamallove",
+    "http://instagram.com/rosekamallove",
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -47,6 +64,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
