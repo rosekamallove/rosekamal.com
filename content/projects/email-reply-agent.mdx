@@ -23,7 +23,7 @@ The system runs as a background job pipeline:
 4. **Peer reviewer** — a third Claude call reviews the draft for tone, accuracy, and whether it actually addresses what was asked. It either approves or returns edits.
 5. **Sender** — approved drafts go out via Resend. Rejections loop back once, then escalate to a human-review queue if they fail again.
 
-```typescript
+```ts
 // Simplified intent classification
 const result = await claude.messages.create({
   model: "claude-opus-4-5",
