@@ -14,7 +14,6 @@ I built an autonomous email reply agent that reads inbound replies to cold outre
 
 Here's exactly how it works.
 
----
 
 ## The Problem
 
@@ -24,7 +23,7 @@ Handling each of these manually is a bottleneck. The replies come in at all hour
 
 This is exactly the kind of problem multi-agent systems are built for.
 
----
+
 
 ## The Architecture
 
@@ -57,7 +56,7 @@ flowchart TD
 
 Every path ends in a CRM note. Nothing gets lost.
 
----
+
 
 ## The Webhook Normalisation Layer
 
@@ -106,7 +105,7 @@ export function normalizeWebhookPayload(
 
 One transformation at the boundary. Everything downstream works with the clean internal type. If EmailBison changes their payload shape again, there's exactly one place to update.
 
----
+
 
 ## The Queue
 
@@ -146,7 +145,7 @@ sequenceDiagram
     Note over Q,W: send-reply job fires after 30–90s delay
 ```
 
----
+
 
 ## The Classifier
 
@@ -178,7 +177,7 @@ const ClassificationSchema = z.object({
 
 The output is always structured. If the model hallucinates a field, Zod throws immediately.
 
----
+
 
 ## The Writer → Reviewer Loop
 
@@ -204,13 +203,13 @@ The Writer drafts the reply. The Reviewer scores it on multiple dimensions (tone
 
 The system tracks the best draft across all passes, not just the last one. Pass 3 isn't always better than Pass 2.
 
-The Reviewer produces a composite score (0–100). Above 80: auto-send. 60–79: surface to human with the draft attached. Below 60: human writes from scratch.
+The Reviewer produces a composite score (0-100). Above 80: auto-send. 60-79: surface to human with the draft attached. Below 60: human writes from scratch.
 
----
+
 
 ## The Humanisation Delay
 
-Sending a reply 3 seconds after receiving an email is obviously automated. The system adds a random 30–90 second delay before sending — enough to feel human, short enough to stay within a 2-minute response window.
+Sending a reply 3 seconds after receiving an email is obviously automated. The system adds a random 30-90 second delay before sending — enough to feel human, short enough to stay within a 2-minute response window.
 
 The naive implementation would be:
 
@@ -236,7 +235,7 @@ const sendReplyWorker = new Worker("send-reply", async (job) => {
 
 Job 1 (writer/reviewer) completes immediately and frees the worker. Job 2 (send) wakes up after the delay and does the actual send. Two jobs, clean separation, no blocked workers.
 
----
+
 
 ## The Integration Layer
 
@@ -276,7 +275,6 @@ async function findPersonByEmail(email: string): Promise<string> {
 
 One extra API call per operation — acceptable for an async background job.
 
----
 
 ## Something I Learned
 
@@ -284,7 +282,7 @@ One extra API call per operation — acceptable for an async background job.
 
 **The normalisation layer is not optional.** External APIs change, have inconsistencies, and often don't match their docs. A single `normalize()` function at the boundary is the difference between a system that breaks everywhere and a system that breaks in one place.
 
----
+
 
 ## What's Next
 
@@ -293,4 +291,161 @@ One extra API call per operation — acceptable for an async background job.
 - Add the `SOFT_NO_NURTURE` writer path (currently routes to human)
 - Structured logging with Langfuse for observability across LLM calls
 
-The core pipeline — webhook → queue → classify → write → review → send — is working end to end. Everything else is iteration.
+The core pipeline — webhook -> queue -> classify -> write -> review -> send — is working end to end. Everything else is iteration.
+
+
+
+## After Going Live
+
+I pushed to production and turned the webhook on. Here is what actually happened.
+
+
+
+### The API was not what I thought it was
+
+I built the integration against the EmailBison docs. The base URL I had was wrong. The endpoint for sending a reply was wrong. The endpoint for fetching thread history was wrong.
+
+The send endpoint I assumed: `POST /threads/{threadId}/reply`
+
+The actual endpoint: `POST /replies/{replyId}/reply`
+
+Not the same object. Not the same ID. And the ID I had been calling `threadId` throughout the codebase was actually `scheduled_email.id` from the webhook payload — a different identifier entirely from the `reply.id` that the send API actually wants.
+
+I found the correct base URL by reading an unrelated export script that had been written months earlier against the live API. The docs were wrong. The script was right.
+
+First real reply came in. Got a 422: `sender_email_id required`. Turns out the API needs `reply_all: true` in the body to infer the sender — otherwise it expects you to specify the sender email ID explicitly. One field, not in the docs, required to make it work.
+
+**Lesson:** Integration tests against the real API before you think you're done. Not mocks. The real thing.
+
+
+### The identifier problem
+
+EmailBison has two identifiers for a reply: a numeric `id` and a `uuid`. The webhook gives you both. The CRM Slack notification (posted by a Zapier automation) embeds the UUID in a URL. The send API uses the numeric ID. The thread history API uses the numeric ID. The Slack search logic I wrote was searching for the UUID while the code was passing the numeric ID.
+
+Everything looked fine in local tests because I never had a real Slack message to search against.
+
+In production, the Slack reaction fired but couldn't find the message — silently skipped. I only noticed when I watched the Slack channel and saw no reaction appear.
+
+Fix: stop searching by ID entirely. The Slack message always contains the lead's email address. Search by email. More reliable, survives any ID format change.
+
+
+### The Attio person creation errors
+
+Three separate issues creating a person record in Attio.
+
+First: `primary_location` — I assumed this was a website field. It's a physical address field. Posted a domain URL, got a 400. Removed the field.
+
+Second: `name` requires `full_name` in addition to `first_name` and `last_name`. Not obvious from the schema. Got a 400 until I added it.
+
+Third: the Notes API scope is separate from the read/write scope. My API key didn't have it. Every note operation returned 403 for two hours before I realised. Added the scope in Attio settings.
+
+None of these errors were fatal to the pipeline — I had wrapped Attio calls in try/catch — but they were all silently failing. The CRM notes weren't being created. The leads weren't being logged anywhere except the console.
+
+**Lesson:** Wrap third-party API calls in try/catch. But also log the failures clearly. Silent recovery masks real problems.
+
+
+### Two events, one reply
+
+EmailBison fires both `LEAD_REPLIED` and `LEAD_INTERESTED` for the same inbound email. They hit the webhook within milliseconds of each other.
+
+My job deduplication is `jobId: reply-${reply.id}`. BullMQ deduplicates on job ID — if the first job hasn't completed yet, the second one with the same ID is dropped. So in most cases, this worked fine.
+
+But during one test, both events had different reply IDs (the system had processed one of them as a new thread). Both jobs ran concurrently. Both saw `attioRecordId = null`. Both called `addToPipeline`. Duplicate deal in Attio.
+
+Fixed with a two-layer guard: check the DB before calling Attio, and check Attio before creating the deal. Either check failing is enough to prevent the duplicate.
+
+
+### `firstReplySentAt` was set too early
+
+After the writer/reviewer pipeline approved a draft, I set `firstReplySentAt` immediately — before the actual send job ran. The intent was to prevent duplicate AI replies on concurrent events.
+
+The problem: the actual send happens in a separate delayed worker, 30-90 seconds later. If EmailBison was down during that window and all three retry attempts failed, the thread would be permanently marked as replied. The lead never received the email. No alert. No recovery path.
+
+Fixed by moving `firstReplySentAt` into `executeSendReply`, set only after `sendReply()` returns successfully.
+
+
+### The retry duplication problem
+
+The send-reply worker has three retry attempts. If the send succeeded but the Slack reaction step threw, BullMQ retried the whole job — including the send. The lead got the same email twice.
+
+The fix: an idempotency check at the top of `executeSendReply`. Before calling the send API, look for an existing outbound `replyLog` entry for this thread. If one exists, skip and return. The retry becomes a no-op.
+
+```ts
+const existing = await db.query.replyLog.findFirst({
+  where: (r, { and, eq }) =>
+    and(eq(r.threadId, thread.id), eq(r.direction, "outbound")),
+})
+if (existing) {
+  console.log(`Skipping duplicate send — already sent`)
+  return
+}
+```
+
+This also means the steps after the send (Slack, Attio, DB log) are each wrapped in their own try/catch. A failure in any of them doesn't cause the job to fail and retry the send.
+
+
+### Second replies were silently dropped
+
+A lead who already got an AI reply would sometimes reply again. The first reply had set `firstReplySentAt`. When the second reply came in, the system hit the guard, logged "already replied," and dropped the job.
+
+No Tom notification. No Attio note. Nothing.
+
+Fixed: when `firstReplySentAt` is set on a thread, route to Tom instead of dropping. Second replies are follow-ups — they need a human.
+
+
+### Emails were being sent as plain text
+
+The first real reply that went out had raw URLs in it — not hyperlinks. The HTML conversion was happening, but the URL regex I wrote excluded `.` from the URL character class, which broke every domain name.
+
+```ts
+// broken — excludes dots from URLs
+/(https?:\/\/[^\s.]+)/g
+
+// fixed — match full URL, trim trailing punctuation after
+/(https?:\/\/[^\s]+)/g
+// then:
+const trimmed = url.replace(/[.,;:!?)]+$/, "")
+```
+
+The fix is to match the whole URL greedily, then trim trailing punctuation as a second step. The regex doesn't try to be smart about where the URL ends — it just trims known trailing punctuation characters.
+
+A second issue: UTM parameters in links made the display text ugly. Added a cleanup pass for display text: keep the UTM params in the `href`, strip them from the visible text.
+
+
+### The classifier needs a confidence floor
+
+The classifier returns a confidence score. I was ignoring it.
+
+An UNSUBSCRIBE classified at 55% confidence got treated the same as one at 99%. A borderline soft-no email that the model was unsure about got suppressed.
+
+Added a threshold: below 70% confidence, route to Tom regardless of the classified intent. The model is uncertain — a human should decide.
+
+
+
+### An intent bucket I hadn't planned for
+
+A real reply came in: "Hi Alex, I'm not the right person for this. I've CC'd the right contacts — I understand they're interested in a demo."
+
+My classifier put it in `REFERRAL`. The handler routed it to Tom with no reply sent.
+
+That's wrong. The CC'd contacts were already on the thread. `reply_all: true` means a reply from us goes to all of them. This is a warm handoff — the right move is a short reply thanking the sender and welcoming the team, with a booking link.
+
+Updated the classifier to treat confirmed-interested referrals as `POSITIVE`, added a writer rule for the intro pattern, added a training example. The next time this came in, the agent handled it correctly.
+
+
+### Em dashes
+
+The drafts coming out of the writer looked good on first read. But reading them out loud, something felt slightly off.
+
+Em dashes. The model loves them. `We built this — specifically for your use case`. `Fast, cheap — and it works`.
+
+Real founders don't write like that. Added a hard rule to the writer prompt: no em dashes. Use a regular hyphen or restructure the sentence. Added a corresponding penalty to the reviewer. The drafts sound more human now.
+
+
+### What I'd do differently
+
+**Test the full pipeline against the real API before writing any logic.** The normalisation bugs, the endpoint bugs, the ID bugs — all of them would have surfaced in the first 10 minutes of real testing. Instead I found them one by one in production.
+
+**Design for retry idempotency from the start.** Every external call in a retryable job should be safe to call twice. Log the result before calling. Check the log before retrying. This is not optional.
+
+**The confidence score is part of the output.** If you're ignoring it, you're throwing away information the model is telling you about its own certainty. Use it.
