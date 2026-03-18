@@ -39,7 +39,7 @@ export default function OutsidePage() {
         {HOBBIES.map((h) => (
           <div
             key={h.label}
-            className="rounded-xl border border-border bg-bg-card px-5 py-4"
+            className="rounded-xl border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card"
           >
             <div className="mb-2 flex items-center gap-2">
               <h.icon size={16} className="text-text-muted" />

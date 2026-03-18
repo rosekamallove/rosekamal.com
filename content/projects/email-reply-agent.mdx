@@ -1,0 +1,56 @@
+---
+title: "Autonomous Email Reply Agent"
+description: "Reads inbound cold outreach replies, classifies intent, drafts a response, has another model peer-review the draft, then sends — no human in the loop."
+startDate: "Mar 2026"
+endDate: "Present"
+status: "active"
+stack: ["TypeScript", "Node.js", "Claude", "BullMQ", "Redis", "Resend"]
+---
+
+## The Problem
+
+Cold outreach at scale generates a lot of replies. Most of them follow predictable patterns — interested, not interested, wrong person, out of office, ask for more info. Handling them manually is repetitive work that slows down the top of the funnel.
+
+The goal: build a system that reads every reply, understands what the person actually means, and sends a good response — without a human touching it.
+
+## Architecture
+
+The system runs as a background job pipeline:
+
+1. **Inbound webhook** — a Resend inbound email webhook fires on every reply, pushing the raw email into a BullMQ queue.
+2. **Classifier** — a Claude call reads the reply and outputs one of a fixed intent set: `interested`, `not_interested`, `wrong_person`, `out_of_office`, `needs_info`, `unsubscribe`.
+3. **Draft agent** — a second Claude call takes the classified intent and the original email thread as context, and drafts a reply. The prompt includes the sender's role, company, and any notes from the CRM.
+4. **Peer reviewer** — a third Claude call reviews the draft for tone, accuracy, and whether it actually addresses what was asked. It either approves or returns edits.
+5. **Sender** — approved drafts go out via Resend. Rejections loop back once, then escalate to a human-review queue if they fail again.
+
+```typescript
+// Simplified intent classification
+const result = await claude.messages.create({
+  model: "claude-opus-4-5",
+  max_tokens: 256,
+  system: CLASSIFIER_SYSTEM_PROMPT,
+  messages: [
+    {
+      role: "user",
+      content: `Classify this reply:\n\n${emailBody}`,
+    },
+  ],
+});
+```
+
+## What Works Well
+
+- **Intent classification** is very reliable — the fixed label set keeps the model from hallucinating novel categories.
+- **The peer-review step** catches most of the bad drafts before they go out. It's cheap (short context, low token count) and catches obvious problems.
+- **BullMQ** gives you retries, dead-letter queues, and concurrency limits out of the box. Running this without a proper queue was a mistake I made early on.
+
+## What's Still Rough
+
+- Replies that quote long previous threads inflate the context and can confuse the classifier. Still experimenting with stripping quoted text before classification.
+- The peer reviewer sometimes over-edits — produces a draft that's technically correct but sounds generic. Working on tighter reviewer prompts.
+
+## Related Writing
+
+I wrote a detailed breakdown of the full system, including the BullMQ setup, Claude prompts, and lessons from running it in production:
+
+→ [Building a Multi-Agent Email Reply System](/writing/building-a-multi-agent-email-reply-system)

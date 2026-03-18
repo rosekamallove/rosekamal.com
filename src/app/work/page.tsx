@@ -146,7 +146,7 @@ function ExperienceCard({
         <ul className="mt-3 space-y-1.5">
           {highlights.map((item, i) => (
             <li key={i} className="flex gap-2 text-sm text-text-secondary">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-yellow" />
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
               {item}
             </li>
           ))}

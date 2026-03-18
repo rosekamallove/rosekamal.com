@@ -109,7 +109,10 @@ export default async function PostPage({ params }: Props) {
                 [
                   rehypePrettyCode,
                   {
-                    theme: "gruvbox-dark-medium",
+                    theme: {
+                      light: "everforest-light",
+                      dark: "everforest-dark",
+                    },
                   },
                 ],
               ],

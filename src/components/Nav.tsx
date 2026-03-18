@@ -11,6 +11,8 @@ const NAV_LINKS = [
   { label: 'outside', href: '/outside' },
 ];
 
+// /links has been retired — social links live on the homepage
+
 export function Nav() {
   const pathname = usePathname();
 
