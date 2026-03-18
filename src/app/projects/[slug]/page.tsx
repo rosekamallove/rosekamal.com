@@ -4,10 +4,13 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import remarkMermaid from "@/lib/remark-mermaid";
 import rehypePrettyCode from "rehype-pretty-code";
+import rehypeSlug from "rehype-slug";
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
 import { getAllProjects, getProject } from "@/lib/project-posts";
 import { getMDXComponents } from "@/components/MDXComponents";
+import { TableOfContentsMobile, TableOfContentsDesktop } from "@/components/TableOfContents";
+import { extractToc } from "@/lib/toc";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -56,82 +59,104 @@ export default async function ProjectPage({ params }: Props) {
   if (!project) notFound();
 
   const status = STATUS_CONFIG[project.status] ?? STATUS_CONFIG.shipped;
+  const toc = extractToc(project.content);
 
   return (
-    <article>
-      <div className="mb-8">
-        <Link
-          href="/projects"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
-        >
-          ← projects
-        </Link>
+    /* Breakout wrapper: wider than the root max-w-2xl on large screens */
+    <div className="lg:-mx-32 xl:-mx-48">
 
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
-          {project.title}
-        </h1>
+      {/* Two-column grid on desktop: article | TOC sidebar */}
+      <div className="lg:grid lg:grid-cols-[1fr_200px] lg:gap-16 xl:grid-cols-[1fr_220px]">
 
-        {/* Meta row: dates + status + live link */}
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <span className="font-mono text-xs text-text-muted">
-            {project.startDate} – {project.endDate}
-          </span>
-
-          <span
-            className={`rounded-full px-2 py-0.5 font-mono text-xs ${status.className}`}
-          >
-            {status.label}
-          </span>
-
-          {project.url && (
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-xs text-text-muted transition-colors hover:text-accent"
+        {/* ── Article column ── */}
+        <article>
+          <div className="mb-8">
+            <Link
+              href="/projects"
+              className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
             >
-              live <ArrowUpRight size={11} />
-            </a>
-          )}
-        </div>
+              ← projects
+            </Link>
 
-        {/* Stack tags */}
-        {project.stack && project.stack.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {project.stack.map((tech) => (
-              <span
-                key={tech}
-                className="rounded-full border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
-              >
-                {tech}
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
+              {project.title}
+            </h1>
+
+            {/* Meta row: dates + status + live link */}
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <span className="font-mono text-xs text-text-muted">
+                {project.startDate} – {project.endDate}
               </span>
-            ))}
-          </div>
-        )}
-      </div>
 
-      <div className="prose prose-neutral dark:prose-invert max-w-none">
-        <MDXRemote
-          source={project.content}
-          options={{
-            mdxOptions: {
-              remarkPlugins: [remarkGfm, remarkMermaid],
-              rehypePlugins: [
-                [
-                  rehypePrettyCode,
-                  {
-                    theme: {
-                      light: "everforest-light",
-                      dark: "everforest-dark",
-                    },
-                  },
-                ],
-              ],
-            },
-          }}
-          components={getMDXComponents()}
-        />
+              <span
+                className={`rounded-full px-2 py-0.5 font-mono text-xs ${status.className}`}
+              >
+                {status.label}
+              </span>
+
+              {project.url && (
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-mono text-xs text-text-muted transition-colors hover:text-accent"
+                >
+                  live <ArrowUpRight size={11} />
+                </a>
+              )}
+            </div>
+
+            {/* Stack tags */}
+            {project.stack && project.stack.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {project.stack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="rounded-full border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Mobile TOC — inline, above the article */}
+          <TableOfContentsMobile entries={toc} />
+
+          <div className="prose prose-neutral dark:prose-invert max-w-none">
+            <MDXRemote
+              source={project.content}
+              options={{
+                mdxOptions: {
+                  remarkPlugins: [remarkGfm, remarkMermaid],
+                  rehypePlugins: [
+                    rehypeSlug,
+                    [
+                      rehypePrettyCode,
+                      {
+                        theme: {
+                          light: "everforest-light",
+                          dark: "everforest-dark",
+                        },
+                      },
+                    ],
+                  ],
+                },
+              }}
+              components={getMDXComponents()}
+            />
+          </div>
+        </article>
+
+        {/* ── Sticky TOC sidebar — desktop only ── */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-8">
+            <TableOfContentsDesktop entries={toc} />
+          </div>
+        </aside>
+
       </div>
-    </article>
+    </div>
   );
 }
