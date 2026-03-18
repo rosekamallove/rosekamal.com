@@ -37,11 +37,18 @@ const EXPERIMENTS: Project[] = [
 
 const PAST: Project[] = [
   {
+    name: "InstantDocs",
+    description:
+      "AI-powered platform that auto-generates professional video documentation and step-by-step guides from screen recordings. Launched on Product Hunt twice — ranked #4 and #1 for the day. 2,000+ guides created with ~100k views.",
+    url: "https://app.instantdocs.com",
+    status: "acquired",
+  },
+  {
     name: "Kroto",
     description:
       "AI course builder for creators — scaled to 500+ courses and 30 paying creators before pivoting to product documentation and getting acquired.",
-    url: "https://app.instantdocs.com",
-    status: "acquired",
+    url: "https://www.youtube.com/watch?v=hIfsfV-pBBI",
+    status: "archived",
   },
 ];
 

@@ -7,6 +7,7 @@ import rehypePrettyCode from "rehype-pretty-code";
 import Link from "next/link";
 import { getAllPosts, getPost } from "@/lib/posts";
 import { getMDXComponents } from "@/components/MDXComponents";
+import { ViewCounter } from "@/components/ViewCounter";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -82,6 +83,7 @@ export default async function PostPage({ params }: Props) {
         </h1>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <time className="font-mono text-xs text-text-muted">{formatted}</time>
+          <ViewCounter slug={slug} />
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {post.tags.map((tag) => (
