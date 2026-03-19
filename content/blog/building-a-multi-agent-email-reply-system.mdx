@@ -276,22 +276,8 @@ async function findPersonByEmail(email: string): Promise<string> {
 One extra API call per operation — acceptable for an async background job.
 
 
-## Something I Learned
-
-**Blocking delays in workers will kill you.** A `setTimeout` inside a job looks harmless until you're running at scale. Use the queue's built-in delay mechanism. Jobs are cheap. Worker slots are not.
-
-**The normalisation layer is not optional.** External APIs change, have inconsistencies, and often don't match their docs. A single `normalize()` function at the boundary is the difference between a system that breaks everywhere and a system that breaks in one place.
 
 
-
-## What's Next
-
-- Wire up real Attio credentials and verify the `findPersonByEmail` filter works against a real workspace
-- Parameterise the sender persona (Calendly link, video URL, sign-off) — currently hardcoded
-- Add the `SOFT_NO_NURTURE` writer path (currently routes to human)
-- Structured logging with Langfuse for observability across LLM calls
-
-The core pipeline — webhook -> queue -> classify -> write -> review -> send — is working end to end. Everything else is iteration.
 
 
 
@@ -299,23 +285,6 @@ The core pipeline — webhook -> queue -> classify -> write -> review -> send �
 
 I pushed to production and turned the webhook on. Here is what actually happened.
 
-
-
-### The API was not what I thought it was
-
-I built the integration against the EmailBison docs. The base URL I had was wrong. The endpoint for sending a reply was wrong. The endpoint for fetching thread history was wrong.
-
-The send endpoint I assumed: `POST /threads/{threadId}/reply`
-
-The actual endpoint: `POST /replies/{replyId}/reply`
-
-Not the same object. Not the same ID. And the ID I had been calling `threadId` throughout the codebase was actually `scheduled_email.id` from the webhook payload — a different identifier entirely from the `reply.id` that the send API actually wants.
-
-I found the correct base URL by reading an unrelated export script that had been written months earlier against the live API. The docs were wrong. The script was right.
-
-First real reply came in. Got a 422: `sender_email_id required`. Turns out the API needs `reply_all: true` in the body to infer the sender — otherwise it expects you to specify the sender email ID explicitly. One field, not in the docs, required to make it work.
-
-**Lesson:** Integration tests against the real API before you think you're done. Not mocks. The real thing.
 
 
 ### The identifier problem
@@ -444,8 +413,16 @@ Real founders don't write like that. Added a hard rule to the writer prompt: no 
 
 ### What I'd do differently
 
-**Test the full pipeline against the real API before writing any logic.** The normalisation bugs, the endpoint bugs, the ID bugs — all of them would have surfaced in the first 10 minutes of real testing. Instead I found them one by one in production.
-
 **Design for retry idempotency from the start.** Every external call in a retryable job should be safe to call twice. Log the result before calling. Check the log before retrying. This is not optional.
 
 **The confidence score is part of the output.** If you're ignoring it, you're throwing away information the model is telling you about its own certainty. Use it.
+
+
+## What's Next
+
+- Wire up real Attio credentials and verify the `findPersonByEmail` filter works against a real workspace
+- Parameterise the sender persona (Calendly link, video URL, sign-off) — currently hardcoded
+- Add the `SOFT_NO_NURTURE` writer path (currently routes to human)
+- Structured logging with Langfuse for observability across LLM calls
+
+The core pipeline — webhook -> queue -> classify -> write -> review -> send — is working end to end. Everything else is iteration.
