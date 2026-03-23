@@ -150,31 +150,6 @@ figure[data-rehype-pretty-code-figure] {
     overflow: hidden;
 }
 
-/* Title bar: pre is display:flex flex-col so ::before flows as the first row */
-figure[data-rehype-pretty-code-figure] > pre[data-language] {
-    display: flex;
-    flex-direction: column;
-}
-
-figure[data-rehype-pretty-code-figure] > pre[data-language]::before {
-    content: attr(data-language);
-    order: -1;
-    display: block;
-    padding: 0.2rem 0.5rem 0.2rem 0.75rem;
-    margin-bottom: 1rem;
-    font-size: 0.65rem;
-    font-family: var(--font-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted) !important;
-    background-color: var(--bg-card) !important;
-    border-bottom: 1px solid var(--border) !important;
-    width: 60px;
-    border-radius: 10px;
-    box-sizing: border-box;
-    /*Left accent line — editor-tab feel */
-    border-bottom: 0.5px solid var(--accent) !important;
-}
 
 /* Code block shell */
 pre[data-theme] {

@@ -62,14 +62,12 @@ export default async function ProjectPage({ params }: Props) {
   const toc = extractToc(project.content);
 
   return (
-    /* Breakout wrapper: wider than the root max-w-2xl on large screens */
-    <div className="lg:-mx-32 xl:-mx-48">
+    <div className="relative">
+      {/* ── Fixed TOC sidebar — desktop only ── */}
+      <TableOfContentsDesktop entries={toc} title={project.title} slug={slug} />
 
-      {/* Two-column grid on desktop: article | TOC sidebar */}
-      <div className="lg:grid lg:grid-cols-[1fr_200px] lg:gap-16 xl:grid-cols-[1fr_220px]">
-
-        {/* ── Article column ── */}
-        <article>
+      {/* ── Article column ── */}
+      <article>
           <div className="mb-8">
             <Link
               href="/projects"
@@ -78,7 +76,7 @@ export default async function ProjectPage({ params }: Props) {
               ← projects
             </Link>
 
-            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
+            <h1 id="post-title" className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
               {project.title}
             </h1>
 
@@ -122,7 +120,7 @@ export default async function ProjectPage({ params }: Props) {
           </div>
 
           {/* Mobile TOC — inline, above the article */}
-          <TableOfContentsMobile entries={toc} />
+          <TableOfContentsMobile entries={toc} title={project.title} slug={slug} />
 
           <div className="prose prose-neutral dark:prose-invert max-w-none">
             <MDXRemote
@@ -136,8 +134,8 @@ export default async function ProjectPage({ params }: Props) {
                       rehypePrettyCode,
                       {
                         theme: {
-                          light: "everforest-light",
-                          dark: "everforest-dark",
+                          light: "github-light",
+                          dark: "github-dark",
                         },
                       },
                     ],
@@ -147,16 +145,7 @@ export default async function ProjectPage({ params }: Props) {
               components={getMDXComponents()}
             />
           </div>
-        </article>
-
-        {/* ── Sticky TOC sidebar — desktop only ── */}
-        <aside className="hidden lg:block">
-          <div className="sticky top-8">
-            <TableOfContentsDesktop entries={toc} />
-          </div>
-        </aside>
-
-      </div>
+      </article>
     </div>
   );
 }
