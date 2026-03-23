@@ -112,7 +112,7 @@ export function TableOfContentsMobile({ entries, title, slug }: TocProps) {
   return (
     <nav
       aria-label="Table of contents"
-      className="mb-10 rounded-xl border border-border bg-bg-card px-5 py-4 lg:hidden"
+      className="mb-10 border border-border bg-bg-card px-5 py-4 lg:hidden"
     >
       <p className="mb-3 font-mono text-xs font-medium tracking-widest text-text-muted">
         on this page

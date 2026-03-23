@@ -145,7 +145,6 @@ html.dark pre[data-theme] span {
 /* ── Code block: figure wrapper + editor tab label ──────────────────────── */
 figure[data-rehype-pretty-code-figure] {
     margin: 1.5rem 0;
-    border-radius: 0.5rem;
     border: 1px solid var(--border);
     overflow: hidden;
 }
@@ -165,7 +164,6 @@ pre[data-theme] {
 
 /* Inline code produced by rehype-pretty-code */
 :not(pre) > code[data-theme] {
-    border-radius: 0.25rem;
     border: 1px solid var(--border);
     padding: 0.1em 0.35em;
     font-size: 0.85em;
@@ -242,7 +240,6 @@ pre[data-theme] {
     & code:not(pre code) {
         background: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: 0.25rem;
         padding: 0.1em 0.35em;
         font-size: 0.85em;
     }

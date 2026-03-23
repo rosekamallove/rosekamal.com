@@ -70,88 +70,102 @@ const EXPERIENCE = [
   },
 ];
 
+function groupByYear(entries: typeof EXPERIENCE) {
+  const map: Record<string, typeof EXPERIENCE> = {};
+  for (const entry of entries) {
+    const year = entry.period.split(" ")[1];
+    if (!map[year]) map[year] = [];
+    map[year].push(entry);
+  }
+  return Object.entries(map).sort(([a], [b]) => Number(b) - Number(a));
+}
+
 export default function WorkPage() {
+  const groups = groupByYear(EXPERIENCE);
+
   return (
     <>
       <section className="mb-20">
         <SectionHeading label="experience" />
-        <div className="space-y-1">
-          {EXPERIENCE.map((role, i) => (
-            <ExperienceCard key={i} {...role} />
+
+        {/* Timeline */}
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-[7px] top-2 bottom-0 w-px bg-border" />
+
+          {groups.map(([year, entries]) => (
+            <div key={year} className="relative mb-10 last:mb-0">
+
+              {/* Year label */}
+              <div className="relative mb-5 flex items-center pl-10">
+                <div className="absolute left-[3px] top-1/2 z-10 h-2 w-2 -translate-y-1/2 border border-border bg-bg" />
+                <span className="font-mono text-xs tracking-widest text-text-muted">{year}</span>
+              </div>
+
+              {/* Entries */}
+              <div className="space-y-8">
+                {entries.map((role, i) => (
+                  <div key={i} className="relative pl-10">
+                    <div className="absolute left-[4.5px] top-[6px] h-[5px] w-[5px] bg-border" />
+                    <div>
+                      <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="font-medium text-text-primary">{role.title}</p>
+                          <p className="text-sm text-text-secondary">
+                            {role.company}
+                            {role.companyNote && (
+                              <span className="text-text-muted"> · {role.companyNote}</span>
+                            )}
+                          </p>
+                        </div>
+                        <div className="shrink-0 sm:text-right">
+                          <p className="font-mono text-xs text-text-muted">{role.period}</p>
+                          <p className="flex items-center gap-1 text-xs text-text-muted sm:justify-end">
+                            <MapPin size={10} />
+                            {role.location}
+                          </p>
+                        </div>
+                      </div>
+
+                      {role.description && (
+                        <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+                          {role.description}
+                        </p>
+                      )}
+
+                      {role.highlights.length > 0 && (
+                        <ul className="mt-3 space-y-1.5">
+                          {role.highlights.map((item, j) => (
+                            <li key={j} className="flex gap-2 text-sm text-text-secondary">
+                              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-muted" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
       <section>
         <SectionHeading label="education" />
-        <div className="rounded-xl border border-border bg-bg-card p-5">
-          <h3 className="font-medium">B.Tech, Computer Science</h3>
+        <div className="relative pl-10">
+          <div className="absolute left-[7px] top-0 bottom-0 w-px bg-border" />
+          <div className="absolute left-[3px] top-[3px] z-10 h-2 w-2 border border-border bg-bg" />
+          <h3 className="font-medium text-text-primary">B.Tech, Computer Science</h3>
           <p className="mt-1 text-sm text-text-secondary">
             Mahatma Jyotiba Phule Rohilkhand University, Bareilly
           </p>
           <p className="mt-0.5 font-mono text-xs text-text-muted">
-            2020 - 2024 (Dropped out in final year to start Kroto)
+            2020 – 2024 · Dropped out in final year to start Kroto
           </p>
         </div>
       </section>
     </>
-  );
-}
-
-function ExperienceCard({
-  title,
-  company,
-  companyNote,
-  period,
-  location,
-  description,
-  highlights,
-}: {
-  title: string;
-  company: string;
-  companyNote?: string;
-  period: string;
-  location: string;
-  description: string | null;
-  highlights: string[];
-}) {
-  return (
-    <div className="group rounded-xl border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
-      <div className="flex flex-col justify-between gap-1 sm:flex-row sm:items-start">
-        <div>
-          <h3 className="font-medium">{title}</h3>
-          <p className="text-sm text-text-secondary">
-            {company}
-            {companyNote && (
-              <span className="text-text-muted"> &middot; {companyNote}</span>
-            )}
-          </p>
-        </div>
-        <div className="shrink-0 text-right">
-          <p className="font-mono text-xs text-text-muted">{period}</p>
-          <p className="flex items-center gap-1 text-xs text-text-muted sm:justify-end">
-            <MapPin size={10} />
-            {location}
-          </p>
-        </div>
-      </div>
-
-      {description && (
-        <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-          {description}
-        </p>
-      )}
-
-      {highlights.length > 0 && (
-        <ul className="mt-3 space-y-1.5">
-          {highlights.map((item, i) => (
-            <li key={i} className="flex gap-2 text-sm text-text-secondary">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
   );
 }

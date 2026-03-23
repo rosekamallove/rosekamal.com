@@ -16,10 +16,10 @@ export default function WritingPage() {
       <SectionHeading label="writing" />
 
       {posts.length === 0 ? (
-        <div className="rounded-xl border border-border bg-bg-card p-6">
+        <div className="border border-border bg-bg-card p-6">
           <p className="text-sm leading-relaxed text-text-secondary">
-            No posts yet — but this is where they&apos;ll live. I&apos;m
-            working on it.
+            No posts yet — but this is where they&apos;ll live. I&apos;m working
+            on it.
           </p>
         </div>
       ) : (
@@ -34,7 +34,7 @@ export default function WritingPage() {
               <Link
                 key={post.slug}
                 href={`/writing/${post.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-xl border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card"
+                className="group flex items-start justify-between gap-4 border border-transparent px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-text-primary">

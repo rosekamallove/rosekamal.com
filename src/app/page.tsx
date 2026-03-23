@@ -1,14 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  MapPin,
-  Mail,
-  Linkedin,
-  Github,
-  XTwitter,
-  Instagram,
-  YouTube,
-} from "@/components/icons";
+import { ArrowUpRight, MapPin } from "@/components/icons";
 
 const PAGE_LINKS = [
   { href: "/work", label: "work", desc: "experience & career", span: 1 },
@@ -18,50 +9,6 @@ const PAGE_LINKS = [
     href: "/outside",
     label: "outside work",
     desc: "guitar, piano, photography",
-    span: 1,
-  },
-];
-
-const SOCIAL_LINKS: {
-  platform: string;
-  handle: string;
-  href: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  span: number;
-}[] = [
-  {
-    platform: "YouTube",
-    handle: "@rosekamallove",
-    href: "https://www.youtube.com/@rosekamallove",
-    icon: YouTube,
-    span: 2,
-  },
-  {
-    platform: "X",
-    handle: "@rosekamallove",
-    href: "https://x.com/rosekamallove",
-    icon: XTwitter,
-    span: 1,
-  },
-  {
-    platform: "GitHub",
-    handle: "@rosekamallove",
-    href: "https://github.com/rosekamallove",
-    icon: Github,
-    span: 1,
-  },
-  {
-    platform: "LinkedIn",
-    handle: "rose-kamal-love",
-    href: "https://www.linkedin.com/in/rose-kamal-love-1146141b0/",
-    icon: Linkedin,
-    span: 1,
-  },
-  {
-    platform: "Instagram",
-    handle: "@rosekamallove",
-    href: "https://instagram.com/rosekamallove",
-    icon: Instagram,
     span: 1,
   },
 ];
@@ -102,17 +49,16 @@ export default function Home() {
       </header>
 
       {/* ── Page navigation bento ── */}
-      <div className="animate-fade-in stagger-4 grid grid-cols-3 gap-3">
+      <div className="animate-fade-in stagger-4 grid grid-cols-1 gap-1 sm:grid-cols-3 sm:gap-3">
         {PAGE_LINKS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            style={{ gridColumn: `span ${item.span}` }}
-            className="group flex flex-col gap-8 rounded-xl border border-border px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
+            className={`group flex items-center justify-between gap-4 border border-border px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card sm:flex-col sm:items-start sm:justify-start sm:gap-8 ${item.span === 2 ? 'sm:col-span-2' : 'sm:col-span-1'}`}
           >
             <span className="font-medium">{item.label}</span>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-text-muted">{item.desc}</span>
+            <div className="flex items-center gap-2 sm:w-full sm:justify-between">
+              <span className="hidden text-sm text-text-muted sm:block">{item.desc}</span>
               <ArrowUpRight
                 size={15}
                 className="text-text-muted transition-colors group-hover:text-text-primary"
@@ -122,60 +68,22 @@ export default function Home() {
         ))}
       </div>
 
-      {/* ── Divider ── */}
-      <div className="animate-fade-in stagger-5 my-6 h-px bg-border" />
-
-      {/* ── Social links bento ── */}
-      <div className="animate-fade-in stagger-6 grid grid-cols-3 gap-3">
-        {SOCIAL_LINKS.map((link) => (
-          <SocialCard key={link.platform} {...link} />
-        ))}
-      </div>
+      {/* ── Links button ── */}
+      <Link
+        href="/links"
+        className="animate-fade-in stagger-5 group mt-3 flex items-center justify-between border border-border px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
+      >
+        <span className="font-medium">links</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-text-muted">
+            find me around the internet
+          </span>
+          <ArrowUpRight
+            size={15}
+            className="text-text-muted transition-colors group-hover:text-text-primary"
+          />
+        </div>
+      </Link>
     </>
-  );
-}
-
-function SocialCard({
-  platform,
-  handle,
-  href,
-  icon: Icon,
-  span,
-}: {
-  platform: string;
-  handle: string;
-  href: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  span: number;
-}) {
-  return (
-    <a
-      href={href}
-      target={href.startsWith("mailto") ? undefined : "_blank"}
-      rel="noopener noreferrer"
-      style={{ gridColumn: `span ${span}` }}
-      className="group relative flex min-h-30 flex-col justify-between overflow-hidden rounded-xl border border-border px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
-    >
-      {/* Large watermark icon */}
-      <Icon
-        size={128}
-        className="absolute -bottom-8 -right-8 text-text-muted opacity-10"
-      />
-
-      {/* Top: small icon + arrow */}
-      <div className="relative z-10 flex items-start justify-between">
-        <Icon size={16} className="text-accent" />
-        <ArrowUpRight
-          size={14}
-          className="text-text-muted transition-colors group-hover:text-text-primary"
-        />
-      </div>
-
-      {/* Bottom: name + handle */}
-      <div className="relative z-10">
-        <p className="text-sm font-medium text-text-primary">{platform}</p>
-        <p className="font-mono text-xs text-text-muted">{handle}</p>
-      </div>
-    </a>
   );
 }

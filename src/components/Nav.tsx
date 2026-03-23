@@ -24,7 +24,7 @@ export function Nav() {
       >
         rkl
       </Link>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         {NAV_LINKS.map((link) => {
           const active = pathname === link.href;
           return (

@@ -87,7 +87,7 @@ export default async function ProjectPage({ params }: Props) {
               </span>
 
               <span
-                className={`rounded-full px-2 py-0.5 font-mono text-xs ${status.className}`}
+                className={`px-2 py-0.5 font-mono text-xs ${status.className}`}
               >
                 {status.label}
               </span>
@@ -110,7 +110,7 @@ export default async function ProjectPage({ params }: Props) {
                 {project.stack.map((tech) => (
                   <span
                     key={tech}
-                    className="rounded-full border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
+                    className="border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
                   >
                     {tech}
                   </span>

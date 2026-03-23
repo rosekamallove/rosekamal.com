@@ -100,7 +100,7 @@ export default async function PostPage({ params }: Props) {
                 {post.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
+                    className="border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
                   >
                     {tag}
                   </span>

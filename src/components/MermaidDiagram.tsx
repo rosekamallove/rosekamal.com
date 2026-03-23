@@ -39,7 +39,7 @@ export function MermaidDiagram({ chart }: Props) {
   return (
     <div
       ref={ref}
-      className="my-6 flex justify-center overflow-x-auto rounded-lg border border-border bg-bg-card p-4"
+      className="my-6 flex justify-center overflow-x-auto border border-border bg-bg-card p-4"
     />
   );
 }

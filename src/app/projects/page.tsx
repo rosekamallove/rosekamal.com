@@ -24,7 +24,17 @@ type Project = {
   endDate: string;
 };
 
-const PINNED: Project[] = [];
+const PINNED: Project[] = [
+  {
+    name: "YouTube",
+    description:
+      "Videos about building with AI — agents, real systems, and what actually works in production.",
+    url: "https://www.youtube.com/@rosekamallove",
+    status: "active",
+    startDate: "Jan 2026",
+    endDate: "Present",
+  },
+];
 
 const EXPERIMENTS: Project[] = [
   {
@@ -132,17 +142,17 @@ function ProjectCard({
   const isExternal = !slug && url?.startsWith("http");
 
   const inner = (
-    <div className="group rounded-xl border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
+    <div className="group border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-medium">{name}</h2>
-          <span
-            className={`rounded-full px-2 py-0.5 font-mono text-xs ${statusClass}`}
-          >
+          <span className={`px-2 py-0.5 font-mono text-xs ${statusClass}`}>
             {label}
           </span>
         </div>
-        {href && <ArrowUpRight size={15} className="mt-0.5 shrink-0 text-text-muted" />}
+        {href && (
+          <ArrowUpRight size={15} className="mt-0.5 shrink-0 text-text-muted" />
+        )}
       </div>
       <p className="mt-0.5 font-mono text-xs text-text-muted">
         {startDate} – {endDate}
@@ -155,7 +165,12 @@ function ProjectCard({
 
   if (href) {
     return isExternal ? (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="block">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
         {inner}
       </a>
     ) : (
