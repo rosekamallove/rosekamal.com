@@ -74,79 +74,69 @@ export default async function PostPage({ params }: Props) {
   };
 
   return (
-    /* Breakout wrapper: wider than the root max-w-2xl on large screens */
-    <div className="lg:-mx-32 xl:-mx-48">
+    <div className="relative">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
 
-      {/* Two-column grid on desktop: article | TOC sidebar */}
-      <div className="lg:grid lg:grid-cols-[1fr_200px] lg:gap-16 xl:grid-cols-[1fr_220px]">
+      {/* ── Fixed TOC sidebar — desktop only, managed inside TableOfContentsDesktop ── */}
+      <TableOfContentsDesktop entries={toc} title={post.title} slug={post.slug} />
 
-        {/* ── Article column ── */}
-        <article>
-          <div className="mb-8">
-            <Link
-              href="/writing"
-              className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
-            >
-              ← writing
-            </Link>
-            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
-              {post.title}
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3">
-              <time className="font-mono text-xs text-text-muted">{formatted}</time>
-              <ViewCounter slug={slug} />
-              {post.tags && post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+      {/* ── Article column ── */}
+      <article>
+        <div className="mb-8">
+          <Link
+            href="/writing"
+            className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          >
+            ← writing
+          </Link>
+          <h1 id="post-title" className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
+            {post.title}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <time className="font-mono text-xs text-text-muted">{formatted}</time>
+            <ViewCounter slug={slug} />
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Mobile TOC — inline, above the article */}
-          <TableOfContentsMobile entries={toc} />
+        {/* Mobile TOC — inline, above the article */}
+        <TableOfContentsMobile entries={toc} title={post.title} slug={post.slug} />
 
-          <div className="prose prose-neutral dark:prose-invert max-w-none">
-            <MDXRemote
-              source={post.content}
-              options={{
-                mdxOptions: {
-                  remarkPlugins: [remarkGfm, remarkMermaid],
-                  rehypePlugins: [
-                    rehypeSlug,
-                    [
-                      rehypePrettyCode,
-                      {
-                        theme: {
-                          light: "everforest-light",
-                          dark: "everforest-dark",
-                        },
+        <div className="prose prose-neutral dark:prose-invert max-w-none">
+          <MDXRemote
+            source={post.content}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [remarkGfm, remarkMermaid],
+                rehypePlugins: [
+                  rehypeSlug,
+                  [
+                    rehypePrettyCode,
+                    {
+                      theme: {
+                        light: "github-light",
+                        dark: "github-dark",
                       },
-                    ],
+                    },
                   ],
-                },
-              }}
-              components={getMDXComponents()}
-            />
-          </div>
-        </article>
-
-        {/* ── Sticky TOC sidebar — desktop only ── */}
-        <aside className="hidden lg:block">
-          <div className="sticky top-8">
-            <TableOfContentsDesktop entries={toc} />
-          </div>
-        </aside>
-
-      </div>
+                ],
+              },
+            }}
+            components={getMDXComponents()}
+          />
+        </div>
+      </article>
     </div>
   );
 }

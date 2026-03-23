@@ -154,12 +154,12 @@ function SocialCard({
       target={href.startsWith("mailto") ? undefined : "_blank"}
       rel="noopener noreferrer"
       style={{ gridColumn: `span ${span}` }}
-      className="group relative flex min-h-[120px] flex-col justify-between overflow-hidden rounded-xl border border-transparent bg-bg-card px-5 py-4 transition-all hover:border-border hover:bg-bg-card-hover"
+      className="group relative flex min-h-30 flex-col justify-between overflow-hidden rounded-xl border border-border px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
     >
       {/* Large watermark icon */}
       <Icon
-        size={64}
-        className="absolute -bottom-2 -right-2 text-text-muted opacity-10"
+        size={128}
+        className="absolute -bottom-8 -right-8 text-text-muted opacity-10"
       />
 
       {/* Top: small icon + arrow */}

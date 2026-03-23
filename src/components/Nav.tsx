@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@/components/ThemeToggle';
+// import { ThemeToggle } from '@/components/ThemeToggle';
 
 const NAV_LINKS = [
   { label: 'work', href: '/work' },
@@ -39,7 +39,7 @@ export function Nav() {
             </Link>
           );
         })}
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
       </div>
     </nav>
   );

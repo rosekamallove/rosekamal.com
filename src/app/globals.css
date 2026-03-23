@@ -16,49 +16,38 @@
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-/* ── Everforest Light (default) ─────────────────────────────────────────── */
+/* ── shadcn Yellow Light ────────────────────────────────────────────────── */
 :root {
-    --bg: #fdf6e3;
-    --bg-card: #f4f0d9;
-    --bg-card-hover: #efebd4;
-    --border: #e0dcc7;
-    --border-hover: #bdc3af;
-    --text-primary: #2d353b;
-    --text-secondary: #5c6a72;
-    --text-muted: #859289;
-    --accent: #8da101;
+    --bg: hsl(0 0% 100%);
+    --bg-card: hsl(60 4.8% 95.9%);
+    --bg-card-hover: hsl(60 4.8% 91%);
+    --border: hsl(20 5.9% 90%);
+    --border-hover: hsl(20 5.9% 80%);
+    --text-primary: hsl(20 14.3% 4.1%);
+    --text-secondary: hsl(20 10% 28%);
+    --text-muted: hsl(25 5.3% 44.7%);
+    --accent: hsl(20 14.3% 4.1%);
 }
 
-/* ── Everforest Dark ────────────────────────────────────────────────────── */
+/* ── shadcn Yellow Dark ─────────────────────────────────────────────────── */
 html.dark {
-    --bg: #2d353b;
-    --bg-card: #343f44;
-    --bg-card-hover: #3d484d;
-    --border: #475258;
-    --border-hover: #4f585e;
-    --text-primary: #d3c6aa;
-    --text-secondary: #9aa79d;
-    --text-muted: #7a8478;
-    --accent: #a7c080;
+    --bg: hsl(20 14.3% 4.1%);
+    --bg-card: hsl(12 6.5% 11%);
+    --bg-card-hover: hsl(12 6.5% 17%);
+    --border: hsl(12 6.5% 18%);
+    --border-hover: hsl(12 6.5% 27%);
+    --text-primary: hsl(60 9.1% 97.8%);
+    --text-secondary: hsl(60 5% 78%);
+    --text-muted: hsl(24 5.4% 55%);
+    --accent: hsl(60 9.1% 97.8%);
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-/* Slightly tone down the grain in dark mode */
-html.dark body {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.12'/%3E%3C/svg%3E");
-}
-
 body {
   background-color: var(--bg);
-  /* Paper grain: SVG feTurbulence noise layered over the base color.
-     Opacity is low so it's subtle — more visible in light mode where the
-     parchment bg sells the paper feel, barely perceptible in dark mode.   */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.32'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 200px 200px;
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -66,8 +55,13 @@ body {
 }
 
 ::selection {
-    background-color: color-mix(in srgb, var(--accent) 25%, transparent);
-    color: var(--accent);
+    background-color: hsl(20 5.9% 80%);
+    color: var(--text-primary);
+}
+
+html.dark ::selection {
+    background-color: hsl(12 6.5% 27%);
+    color: var(--text-primary);
 }
 
 @keyframes fade-in {
@@ -123,7 +117,7 @@ body {
     animation-delay: 0.8s;
 }
 
-/* ── rehype-pretty-code — dual Everforest themes ────────────────────────── */
+/* ── rehype-pretty-code — dual GitHub themes (code blocks only) ─────────── */
 /* rehype-pretty-code with theme: { light, dark } emits NO inline color/bg —
    only CSS custom properties: --shiki-light, --shiki-dark,
    --shiki-light-bg, --shiki-dark-bg. We wire those up here.                 */
@@ -203,7 +197,7 @@ pre[data-theme] {
     font-family: var(--font-mono);
 }
 
-/* ── Scrollbar — themed to Everforest ───────────────────────────────────── */
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
 
 /* Webkit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {

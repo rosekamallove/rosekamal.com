@@ -34,7 +34,7 @@ export default function WritingPage() {
               <Link
                 key={post.slug}
                 href={`/writing/${post.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-lg border border-transparent px-1 py-3 transition-colors hover:border-border hover:bg-bg-card"
+                className="group flex items-start justify-between gap-4 rounded-xl border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-text-primary">
