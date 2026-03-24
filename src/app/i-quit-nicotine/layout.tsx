@@ -9,12 +9,14 @@ export const metadata: Metadata = {
     url: "https://rosekamal.com/i-quit-nicotine",
     type: "website",
     siteName: "Rose Kamal Love",
+    images: [{ url: "/i-quit-nicotine/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "I Quit Nicotine",
     description: "Live counter tracking how long it's been since I quit nicotine.",
     creator: "@rosekamallove",
+    images: ["/i-quit-nicotine/opengraph-image"],
   },
 };
 
