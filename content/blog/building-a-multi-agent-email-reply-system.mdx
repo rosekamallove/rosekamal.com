@@ -420,9 +420,6 @@ Real founders don't write like that. Added a hard rule to the writer prompt: no 
 
 ## What's Next
 
-- Wire up real Attio credentials and verify the `findPersonByEmail` filter works against a real workspace
-- Parameterise the sender persona (Calendly link, video URL, sign-off) - currently hardcoded
-- Add the `SOFT_NO_NURTURE` writer path (currently routes to human)
-- Structured logging with Langfuse for observability across LLM calls
+The core pipeline — webhook → queue → classify → write → review → send — is working end to end. But it only handles the first reply. What happens when a lead doesn't respond at all? What happens when they reply again after getting the AI's message?
 
-The core pipeline (webhook -> queue -> classify -> write -> review -> send) is working end to end. Everything else is iteration.
+Part 2 covers both: a 9-message nudge sequence that self-chains through BullMQ, a Slack-based control layer for pausing and resuming, and making the agent multi-turn so it can handle follow-up questions instead of handing off to a human after the first send. Including the production bugs that came with each of those.

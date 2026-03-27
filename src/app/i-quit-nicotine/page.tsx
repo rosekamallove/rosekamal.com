@@ -77,7 +77,7 @@ export default function IQuitNicotinePage() {
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-16 bg-bg px-6">
       <p className="font-mono text-[0.65rem] tracking-[0.3em] text-text-muted uppercase">
-        nicotine free for
+        cigarette free for
       </p>
 
       <div className="grid grid-cols-2 gap-x-10 gap-y-12 sm:flex sm:gap-16 lg:gap-24">

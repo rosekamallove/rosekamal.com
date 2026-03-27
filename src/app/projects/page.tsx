@@ -47,6 +47,15 @@ const EXPERIMENTS: Project[] = [
     endDate: "Present",
   },
   {
+    name: "Startups With Funding",
+    description:
+      "Daily digest of startup funding announcements scraped from 15+ sources across US, Europe, and India — with founder contact enrichment. Fully autonomous pipeline running every weekday morning.",
+    url: "https://www.startupswithfunding.com/",
+    status: "active",
+    startDate: "Mar 2026",
+    endDate: "Present",
+  },
+  {
     name: "YouTube",
     description:
       "Videos about building with AI — agents, real systems, and what actually works in production.",
