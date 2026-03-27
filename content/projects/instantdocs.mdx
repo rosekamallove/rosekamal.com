@@ -10,7 +10,7 @@ url: "https://app.instantdocs.com"
 
 ## What It Was
 
-InstantDocs turned screen recordings into professional documentation automatically. You record yourself walking through a product flow, upload the video, and it comes back as a polished step-by-step guide with screenshots, numbered steps, and a narrated walkthrough — no manual editing.
+InstantDocs turned screen recordings into professional documentation automatically. You record yourself walking through a product flow, upload the video, and it comes back as a polished step-by-step guide with screenshots, numbered steps, and a narrated walkthrough. No manual editing.
 
 This was the pivot from [Kroto](/projects/kroto). We discovered through customer conversations that product teams needed documentation tooling more urgently than course creation tooling. So we rebuilt the product around that use case.
 
@@ -22,19 +22,18 @@ This was the pivot from [Kroto](/projects/kroto). We discovered through customer
 4. GPT-4V receives the frames + transcript and generates structured step-by-step documentation.
 5. The output renders as a shareable guide with embedded screenshots, copyable step text, and an embedded video player.
 
-The hardest part was making the frame extraction smart enough to capture the right moments. Raw scene detection produces too many frames (every cursor movement is a "scene change"). We ended up doing two passes — coarse detection, then a GPT-4V pass that selected the most informative subset.
+The hardest part was making the frame extraction smart enough to capture the right moments. Raw scene detection produces too many frames (every cursor movement is a "scene change"). We ended up doing two passes: coarse detection first, then a GPT-4V pass that selected the most informative subset.
 
 ## Results
 
 - Launched on Product Hunt twice: ranked **#4** the first time, **#1 Product of the Day** the second.
-- **2,000+ guides** created.
-- **~100,000 views** across published guides.
-- Acquired by OptimizeCX and rebranded as their core documentation product.
+- **2,000+ guides** created, with **~100,000 views** across published guides.
+- Acquired by [GrooveHQ](https://www.groovehq.com/blog/groove-acquires-kroto) and rebranded as their core documentation product.
 
 ## What I Learned
 
-**Pivot fast when customers tell you something.** The course-builder version had users — but when we started asking "what's the most painful documentation problem you have," we heard the same answer from a dozen companies in three weeks. That's a signal.
+**Pivot fast when customers tell you something.** The course-builder version had users, but when we started asking "what's the most painful documentation problem you have," we heard the same answer from a dozen companies in three weeks. That's a signal.
 
-**Video processing is operationally expensive.** FFmpeg jobs, storage, CDN egress — the unit economics are harder than pure SaaS. We had to be careful about which tiers got full video processing vs. static screenshots only.
+**Video processing is operationally expensive.** FFmpeg jobs, storage, CDN egress. The unit economics are harder than pure SaaS. We had to be careful about which tiers got full video processing vs. static screenshots only.
 
 **Product Hunt ranking is a vanity metric with one real use.** It drove spikes of sign-ups that were mostly useless (wrong ICP) but generated enough social proof to open enterprise conversations. Treat it as a PR event, not a growth channel.

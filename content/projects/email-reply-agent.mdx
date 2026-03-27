@@ -4,53 +4,76 @@ description: "Reads inbound cold outreach replies, classifies intent, drafts a r
 startDate: "Mar 2026"
 endDate: "Present"
 status: "active"
-stack: ["TypeScript", "Node.js", "Claude", "BullMQ", "Redis", "Resend"]
+stack: ["TypeScript", "Node.js", "Claude", "BullMQ", "Redis", "PostgreSQL", "Slack", "Resend"]
 ---
 
-## The Problem
+Cold outreach at scale means a lot of replies. Most of them follow the same patterns: interested, not interested, wrong person, out of office, asking for more info. Handling them manually is repetitive and slows down the top of the funnel.
 
-Cold outreach at scale generates a lot of replies. Most of them follow predictable patterns — interested, not interested, wrong person, out of office, ask for more info. Handling them manually is repetitive work that slows down the top of the funnel.
+So I built something that handles it. The agent reads every inbound reply, figures out what the person means, writes back, and follows up if they go quiet. No human in the loop unless it actually needs one.
 
-The goal: build a system that reads every reply, understands what the person actually means, and sends a good response — without a human touching it.
+## How it works
 
-## Architecture
+A webhook fires on every inbound reply and pushes it into a BullMQ queue. From there:
 
-The system runs as a background job pipeline:
+A Claude call classifies the reply into a fixed intent set: `POSITIVE`, `QUESTION`, `SOFT_NO`, `REFERRAL`, `UNSUBSCRIBE`, `OOO`, and a few others. It also returns a confidence score. Below 70% confidence, it routes to a human regardless of what the intent was. The model's uncertainty is useful information.
 
-1. **Inbound webhook** — a Resend inbound email webhook fires on every reply, pushing the raw email into a BullMQ queue.
-2. **Classifier** — a Claude call reads the reply and outputs one of a fixed intent set: `interested`, `not_interested`, `wrong_person`, `out_of_office`, `needs_info`, `unsubscribe`.
-3. **Draft agent** — a second Claude call takes the classified intent and the original email thread as context, and drafts a reply. The prompt includes the sender's role, company, and any notes from the CRM.
-4. **Peer reviewer** — a third Claude call reviews the draft for tone, accuracy, and whether it actually addresses what was asked. It either approves or returns edits.
-5. **Sender** — approved drafts go out via Resend. Rejections loop back once, then escalate to a human-review queue if they fail again.
+A second Claude call drafts the reply, given the classified intent, the full thread history, and the sender's CRM context.
+
+A third Claude call reviews the draft and scores it 0-100 on tone, accuracy, and whether it actually addresses what was asked. 80+ sends automatically. 60-79 goes to Slack for the operator to approve or rewrite. Below 60, the human writes from scratch.
 
 ```ts
-// Simplified intent classification
 const result = await claude.messages.create({
   model: "claude-opus-4-5",
   max_tokens: 256,
   system: CLASSIFIER_SYSTEM_PROMPT,
-  messages: [
-    {
-      role: "user",
-      content: `Classify this reply:\n\n${emailBody}`,
-    },
-  ],
+  messages: [{ role: "user", content: `Classify this reply:\n\n${emailBody}` }],
 });
 ```
 
-## What Works Well
+## Nudge system
 
-- **Intent classification** is very reliable — the fixed label set keeps the model from hallucinating novel categories.
-- **The peer-review step** catches most of the bad drafts before they go out. It's cheap (short context, low token count) and catches obvious problems.
-- **BullMQ** gives you retries, dead-letter queues, and concurrency limits out of the box. Running this without a proper queue was a mistake I made early on.
+If a lead doesn't reply, the agent follows up. After the first AI reply goes out, a 9-message sequence fires over roughly three weeks. Each nudge is a BullMQ job with a delay baked in. When one fires, it queues the next before returning. Self-chaining.
 
-## What's Still Rough
+The sequence stops when the lead replies, a booking webhook fires, the operator pauses it from Slack, or the intent comes back as UNSUBSCRIBE or a hard no.
 
-- Replies that quote long previous threads inflate the context and can confuse the classifier. Still experimenting with stripping quoted text before classification.
-- The peer reviewer sometimes over-edits — produces a draft that's technically correct but sounds generic. Working on tighter reviewer prompts.
+Nudge bodies are generated at send time with the full thread as context, not from static templates. If the lead asked about pricing two messages ago, the next nudge knows that. Early nudges are short check-ins, later ones carry soft urgency, the final one closes cleanly. Static templates are kept as a fallback if the AI call fails.
 
-## Related Writing
+## Multi-turn
 
-I wrote a detailed breakdown of the full system, including the BullMQ setup, Claude prompts, and lessons from running it in production:
+The agent isn't limited to one reply per lead. When a lead follows up with a question after getting an AI reply, the classifier routes it back through the same write/review loop with the full thread injected as context, rather than handing off to a human immediately.
 
-→ [Building a Multi-Agent Email Reply System](/writing/building-a-multi-agent-email-reply-system)
+```
+Turn 1: classify → write → review → send → nudge sequence starts
+Turn 2: classify → thread history fetched → write → review → send → nudge resumes from position
+Turn N > maxAiTurns: route to operator with thread summary
+```
+
+Some intents always go to the operator regardless of turn count: REFERRAL, pricing pushback above a certain signal strength, anything below the confidence threshold. The agent shouldn't be handling complex negotiation.
+
+After a successful re-reply, the nudge sequence resumes from its current position rather than restarting from 1.
+
+## Slack controls
+
+Every AI action posts to Slack. The operator controls live there:
+
+Pause AI cancels all queued nudge jobs for a thread. Resume re-queues the next nudge from the current position, using the sequence-defined delay rather than a hardcoded 1 day (later nudges have 2-4 day gaps, compressing them looks bad).
+
+Score 60-79 drafts post to Slack with the draft body and two buttons: "Send this" or "Decline". The draft is stored in Redis with a 30-minute TTL; the button value is just the Redis key to avoid Slack's 2000-character button value limit.
+
+If the operator edits a draft and sends it manually from their inbox, there's a "I sent it manually, start nudges" button that kicks off the sequence without touching the CRM.
+
+## What's still unfinished
+
+Meeting no-shows leave threads paused indefinitely. If a lead books a call and ghosts it, nothing re-engages them automatically.
+
+Cold re-engagements (lead goes quiet, comes back months later) correctly route to the operator for the first reply back. But there's no automated path to restart the nudge sequence after that.
+
+`maxAiTurns` is set conservatively right now. It needs calibration against real thread data to find where reply quality actually starts slipping.
+
+## Related writing
+
+Full build breakdown across two posts:
+
+→ [Part 1: Core Pipeline](/writing/building-a-multi-agent-email-reply-system)
+
+→ [Part 2: Nudges, Edge Cases & Multi-Turn](/writing/building-a-multi-agent-email-reply-system-part-2)

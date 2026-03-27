@@ -97,26 +97,13 @@ export default async function ProjectPage({ params }: Props) {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-mono text-xs text-text-muted transition-colors hover:text-accent"
+                  className="inline-flex items-center gap-1.5 border border-border bg-bg-card px-2.5 py-1 font-mono text-xs text-text-secondary transition-colors hover:border-accent hover:text-accent"
                 >
-                  live <ArrowUpRight size={11} />
+                  live site <ArrowUpRight size={11} />
                 </a>
               )}
             </div>
 
-            {/* Stack tags */}
-            {project.stack && project.stack.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {project.stack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="border border-border bg-bg-card px-2 py-0.5 font-mono text-xs text-text-muted"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Mobile TOC — inline, above the article */}

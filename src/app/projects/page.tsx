@@ -50,7 +50,7 @@ const EXPERIMENTS: Project[] = [
     name: "Startups With Funding",
     description:
       "Daily digest of startup funding announcements scraped from 15+ sources across US, Europe, and India — with founder contact enrichment. Fully autonomous pipeline running every weekday morning.",
-    url: "https://www.startupswithfunding.com/",
+    slug: "startupswithfunding",
     status: "active",
     startDate: "Mar 2026",
     endDate: "Present",
@@ -146,22 +146,62 @@ function ProjectCard({
   };
   const { label, className: statusClass } = statusConfig[status];
 
-  // Slug write-up page takes priority; fall back to url
-  const href = slug ? `/projects/${slug}` : url;
-  const isExternal = !slug && url?.startsWith("http");
+  const detailHref = slug ? `/projects/${slug}` : null;
+  const isExternalOnly = !slug && !!url;
 
-  const inner = (
-    <div className="group border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
-      <div className="flex items-start justify-between gap-2">
+  // External-only card (no write-up page) — whole card is the link
+  if (isExternalOnly) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+        <div className="group border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-medium">{name}</h2>
+              <span className={`px-2 py-0.5 font-mono text-xs ${statusClass}`}>
+                {label}
+              </span>
+            </div>
+            <ArrowUpRight size={15} className="mt-0.5 shrink-0 text-text-muted" />
+          </div>
+          <p className="mt-0.5 font-mono text-xs text-text-muted">
+            {startDate} – {endDate}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            {description}
+          </p>
+        </div>
+      </a>
+    );
+  }
+
+  // Card with a write-up page — stretched link covers the card, live URL floats above
+  return (
+    <div className="group relative border border-transparent px-5 py-4 transition-all hover:border-border hover:bg-bg-card">
+      {detailHref && (
+        <Link href={detailHref} className="absolute inset-0" aria-label={name} />
+      )}
+      <div className="relative flex items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-medium">{name}</h2>
           <span className={`px-2 py-0.5 font-mono text-xs ${statusClass}`}>
             {label}
           </span>
         </div>
-        {href && (
-          <ArrowUpRight size={15} className="mt-0.5 shrink-0 text-text-muted" />
-        )}
+        <div className="flex items-center gap-3">
+          {url && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10 inline-flex items-center gap-1 font-mono text-xs text-text-muted transition-colors hover:text-accent"
+            >
+              live <ArrowUpRight size={11} />
+            </a>
+          )}
+          {detailHref && (
+            <ArrowUpRight size={15} className="mt-0.5 shrink-0 text-text-muted" />
+          )}
+        </div>
       </div>
       <p className="mt-0.5 font-mono text-xs text-text-muted">
         {startDate} – {endDate}
@@ -171,22 +211,4 @@ function ProjectCard({
       </p>
     </div>
   );
-
-  if (href) {
-    return isExternal ? (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        {inner}
-      </a>
-    ) : (
-      <Link href={href} className="block">
-        {inner}
-      </Link>
-    );
-  }
-  return inner;
 }

@@ -1,0 +1,39 @@
+---
+title: "Startups With Funding"
+description: "Daily digest of startup funding announcements scraped from 15+ sources across US, Europe, and India — with founder contact enrichment."
+startDate: "Mar 2026"
+endDate: "Present"
+status: "active"
+stack: ["TypeScript", "Node.js", "GPT-4o-mini", "Playwright", "Drizzle ORM", "PostgreSQL", "BullMQ", "Resend", "Fly.io"]
+url: "https://www.startupswithfunding.com/"
+---
+
+Funding announcements are scattered across TechCrunch, PR Newswire, SEC filings, regional outlets like Inc42, and dozens of VC portfolio pages. There's no single place that pulls them together, removes the duplicates, and attaches verified founder contact info.
+
+This is a fully autonomous pipeline that runs every weekday morning, collects funding news from 15+ sources, extracts structured data via LLM, enriches it with founder contacts, and sends a daily digest.
+
+## Pipeline
+
+The pipeline runs as a scheduled job on Fly.io. Each stage feeds the next:
+
+**Source pollers** pull from RSS feeds (TechCrunch, Business Wire, EU-Startups, Inc42, YourStory), SEC EDGAR Form D filings, the Companies House streaming API, and weekly Playwright-based scans of VC portfolio pages for new additions.
+
+**Deduplication** happens in two passes. A SHA-256 hash of the normalized URL skips already-seen articles before any fetching. A SimHash of the article body catches syndicated copies at different URLs, which is common when the same announcement hits TechCrunch, Business Wire, and a regional outlet the same morning.
+
+**Pre-filtering** runs a keyword and regex check before any LLM call. If the article doesn't mention a money amount and at least one funding keyword, it's dropped. This eliminates roughly 60% of articles cheaply.
+
+**LLM extraction** uses GPT-4o-mini via the Batch API to pull structured JSON from each confirmed funding article: company, amount, round type, investors, founders, sector, location. Submitting a batch at the end of the scrape run and polling an hour later cuts costs by 50% compared to synchronous calls.
+
+**Contact enrichment** chains Apollo.io for founder emails and LinkedIn URLs, Hunter.io for email pattern discovery when Apollo comes up empty, and Findymail for verification. Only verified contacts make it into the digest.
+
+## Data sources
+
+US coverage comes from TechCrunch, Business Wire, PR Newswire, and SEC EDGAR Form D filings. Europe via EU-Startups, Tech.eu, Sifted, and Companies House. India via Inc42, YourStory, Economic Times, and Entrackr. Portfolio pages from Sequoia, a16z, Accel, Balderton, Blume, and others are scanned weekly.
+
+## What's rough
+
+Cloudflare-protected targets like Sifted and some VC pages block direct scraping. For those, the pipeline falls back to Google News RSS as an indirect source, or skips them until residential proxies are worth the cost.
+
+Contact enrichment hit rate varies a lot by region. US founders have solid Apollo coverage. India and Eastern Europe coverage is much spottier, which means the digest is less useful for those geographies right now.
+
+The Companies House streaming API is a good signal in theory (a new VC joining a board usually means an investment just closed), but it generates a lot of noise from restructuring events that have nothing to do with funding rounds.
