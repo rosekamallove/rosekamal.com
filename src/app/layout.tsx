@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
+import { Analytics } from "@vercel/analytics/next";
 
 const siteUrl = "https://rosekamal.com";
 const description =
@@ -71,6 +72,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen">
+        <Analytics />
         <div className="mx-auto max-w-2xl px-6 py-8 sm:py-16">
           <Nav />
           <main>{children}</main>
