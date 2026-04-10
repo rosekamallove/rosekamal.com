@@ -19,8 +19,16 @@ Animotion is a Next.js app that generates [Remotion](https://remotion.dev) compo
 
 The AI part: Claude plans the animation (phases, timing, visual elements), then Claude Opus writes the full component. The file gets written to disk, TypeScript-validated, auto-fixed if needed, registered in the Remotion project, and previewed inline via `@remotion/player`.
 
-```
-You describe it → Claude plans it → You review/edit → Claude codes it → TypeScript validated → Preview plays inline
+```mermaid
+flowchart LR
+    A[Describe it] --> B[Claude plans it]
+    B --> C[You review/edit]
+    C -->|feedback| B
+    C -->|approve| D[Claude codes it]
+    D --> E[TypeScript validated]
+    E -->|errors| F[Auto-fix with Opus]
+    F --> E
+    E -->|pass| G[Preview plays inline]
 ```
 
 Two models handle different jobs:
@@ -54,6 +62,20 @@ Three hard-coded styles that affect both planning and code generation:
 
 Each preset injects its own colors, glass styles, grid background, spring configs, and design rules directly into the system prompt. The code gen model copies the inline theme into every component it generates.
 
+```mermaid
+flowchart TD
+    STYLE[Style Preset<br/>Professional / Playful / Standard] --> THEME[Inline Theme<br/>colors, glass, gridBg]
+    STYLE --> RULES[Style Rules<br/>spring configs, layout constraints]
+    THEME --> PROMPT[Code System Prompt]
+    RULES --> PROMPT
+    EXAMPLES[2 Example Scenes<br/>CompressionImpact + KVPairVisual] --> PROMPT
+    PATTERNS[8 Animation Patterns<br/>fadeIn, pop, bounce, shake...] --> PROMPT
+    LAYOUT[Layout Rules<br/>centered flex, no scatter] --> PROMPT
+    PROMPT --> OPUS[Claude Opus 4.6]
+    PLAN[Animation Plan<br/>phases, timing, elements] --> OPUS
+    OPUS --> TSX[Generated .tsx Component]
+```
+
 ### Plan Review
 
 After Claude generates a plan, you don't just approve or reject. You can:
@@ -67,6 +89,24 @@ The revision uses multi-turn conversation. Claude sees its original plan as a pr
 ### Streaming
 
 Both plan generation and code generation stream to the UI in real-time.
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Next.js API
+    participant Claude API
+
+    Browser->>Next.js API: POST /api/generate-plan
+    Next.js API->>Claude API: messages.stream() with tool_use
+    loop Every input_json_delta
+        Claude API-->>Next.js API: partial JSON chunk + snapshot
+        Next.js API-->>Browser: SSE: { type: "delta", snapshot }
+        Browser->>Browser: Update plan preview card
+    end
+    Claude API-->>Next.js API: finalMessage (complete plan)
+    Next.js API-->>Browser: SSE: { type: "done", plan }
+    Browser->>Browser: Transition to review state
+```
 
 For the plan, I'm using Anthropic's `inputJson` event from the streaming SDK. It fires on every `input_json_delta` and gives you a `jsonSnapshot`, which is the SDK's incrementally parsed JSON object. So the plan card fills in progressively. Scene name appears, then description, then phases pop in one by one, then visual elements. The snapshot is throttled to emit every 150ms to prevent React from batching 50 events into one render.
 
@@ -90,7 +130,20 @@ Everything persists in `sessionStorage`. If code gen fails or you accidentally r
 
 ### TypeScript Validation
 
-After writing the scene file, the system runs `npx tsc --noEmit` against the Remotion project. If it finds errors, Opus takes a crack at fixing them automatically. The UI shows a step-by-step progress: writing file, validating TypeScript, auto-fixing. If it still fails, you see the errors in a structured format with error code, file, line number, not just a wall of red text.
+After writing the scene file, the system runs `npx tsc --noEmit` against the Remotion project. If it finds errors, Opus takes a crack at fixing them automatically.
+
+```mermaid
+flowchart LR
+    W[Write .tsx to disk] --> R[Update Root.tsx<br/>+ registry + manifest]
+    R --> V{npx tsc --noEmit}
+    V -->|pass| P[Preview with<br/>@remotion/player]
+    V -->|fail| F[Opus auto-fix]
+    F --> W2[Rewrite .tsx] --> V2{tsc again}
+    V2 -->|pass| P
+    V2 -->|fail| E[Show structured<br/>error to user]
+```
+
+The UI shows a step-by-step progress: writing file, validating TypeScript, auto-fixing. If it still fails, you see the errors in a structured format with error code, file, line number, not just a wall of red text.
 
 ## What Didn't Work (At First)
 
@@ -113,6 +166,25 @@ Style presets show mini preview swatches with a fake card shape, a color bar sho
 Right now every animation is standalone. That's fine for one-offs but it's not how I actually work. For a video, I need 8-12 clips that all look the same. Same colors, same animation feel, same font loading, same grid background.
 
 The next feature is groups. You create a group ("TurboQuant Explainer"), pick a style, and start adding scenes. Each new scene in the group sees the code from previous scenes via a rolling window: the 2 most recent scenes are included as full code references in the system prompt, older scenes get reduced to summaries. This way Claude always matches the design language without you having to describe it every time.
+
+```mermaid
+flowchart TD
+    subgraph Group: TurboQuant Explainer
+        S1[Scene 1: IntroHook]
+        S2[Scene 2: MemoryWall]
+        S3[Scene 3: Compression]
+        S4[Scene 4: QJLProjection]
+    end
+
+    S1 -->|full code| CTX2[Context for Scene 2]
+    S1 -->|full code| CTX3[Context for Scene 3]
+    S2 -->|full code| CTX3
+    S2 -->|summary only| CTX4[Context for Scene 4]
+    S3 -->|full code| CTX4
+    
+    CTX4 --> PROMPT[System Prompt +<br/>GROUP CONTEXT section]
+    PROMPT --> S5[Scene 5: new scene<br/>matches design language]
+```
 
 The layout changes too. Moving from the current single-column flow to a sidebar layout like Remotion Studio. Left side: groups and scenes in a collapsible tree. Right side: the creation flow or a scene preview depending on what's selected.
 
