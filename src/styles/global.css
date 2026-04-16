@@ -503,10 +503,33 @@ figure[data-rehype-pretty-code-figure]:hover .code-copy,
   color: var(--text-secondary);
 }
 
-/* Keyboard-selected writing row */
+/* ── Writing list: title highlight on hover + keyboard selection ─────── */
+.writing-title {
+  display: inline-block;
+  transition: color 0.2s ease, transform 0.25s var(--ease-out-expo);
+}
+.group:hover .writing-title {
+  color: var(--accent);
+  transform: translateX(6px);
+}
+/* Keyboard nav reads as "selected" (firm) rather than "hovered" (playful):
+   title turns accent, a thin accent bar anchors the row on the left.
+   No translate here so the title stays aligned with the meta below it. */
+.kb-selected .writing-title {
+  color: var(--accent);
+}
 .kb-selected {
-  background: var(--bg-card) !important;
-  border-color: var(--border-hover) !important;
+  position: relative;
+}
+.kb-selected::before {
+  content: "";
+  position: absolute;
+  left: -0.9rem;
+  top: 0.15rem;
+  bottom: 0.15rem;
+  width: 2px;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
 /* ── Collapsible mobile TOC ──────────────────────────────────────────── */

@@ -2,12 +2,31 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SectionHeading from "@/components/SectionHeading.astro";
+import Icon from "@/components/Icon.astro";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const fmt = (d: Date) =>
-  d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+const fmtShort = (d: Date) =>
+  d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+const fmtFull = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+function readingTime(body: string | undefined): number {
+  return Math.max(1, Math.round((body ?? "").split(/\s+/).length / 220));
+}
+
+const featured = posts[0];
+// When the featured card is enabled above, change `posts` to `posts.slice(1)`
+// in this reduce so the featured post isn't shown twice.
+const byYear = posts.reduce<Record<number, typeof posts>>((acc, p) => {
+  const y = p.data.date.getFullYear();
+  (acc[y] ??= []).push(p);
+  return acc;
+}, {});
+const years = Object.keys(byYear)
+  .map(Number)
+  .sort((a, b) => b - a);
 ---
 
 <BaseLayout title="Writing" description="Essays and thoughts on building software, startups, and AI.">
@@ -22,7 +41,7 @@ const fmt = (d: Date) =>
       </div>
     ) : (
       <>
-        <p class="mb-4 hidden font-mono text-[0.7rem] tracking-[0.15em] text-text-muted uppercase sm:block">
+        <p class="mb-6 hidden font-mono text-[0.7rem] tracking-[0.15em] text-text-muted uppercase sm:block">
           <span class="inline-flex items-center gap-1.5">
             <kbd class="rounded border border-border px-1 py-0.5 text-[0.6rem]">j</kbd>
             <kbd class="rounded border border-border px-1 py-0.5 text-[0.6rem]">k</kbd>
@@ -32,30 +51,87 @@ const fmt = (d: Date) =>
             <span>open</span>
           </span>
         </p>
-        <ol class="space-y-px" data-writing-list>
-          {posts.map((post) => (
-            <li>
-              <a
-                href={`/writing/${post.id}`}
-                class="group flex items-start justify-between gap-4 rounded border border-transparent px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
-              >
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-medium text-text-primary group-hover:text-accent transition-colors">
-                    {post.data.title}
-                  </p>
-                  {post.data.description && (
-                    <p class="mt-0.5 truncate text-xs text-text-muted">
-                      {post.data.description}
-                    </p>
-                  )}
-                </div>
-                <time class="shrink-0 pt-0.5 font-mono text-xs text-text-muted tabular-nums">
-                  {fmt(post.data.date)}
-                </time>
-              </a>
-            </li>
+
+        {/* Featured (latest) post — disabled for now, re-enable by uncommenting.
+        {featured && (
+          <a
+            href={`/writing/${featured.id}`}
+            data-writing-link
+            class="group relative block rounded border border-border bg-bg-elev px-6 py-6 transition-all hover:border-border-hover hover:bg-bg-card sm:px-7 sm:py-7"
+          >
+            <h2 class="font-serif text-[1.8rem] leading-[1.15] tracking-tight text-text-primary transition-colors group-hover:text-accent sm:text-[2.1rem]">
+              {featured.data.title}
+            </h2>
+            <p class="mt-3 text-[0.95rem] leading-relaxed text-text-secondary">
+              {featured.data.description}
+            </p>
+            <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[0.7rem] text-text-muted">
+              <time class="tabular-nums">{fmtFull(featured.data.date)}</time>
+              <span class="opacity-40">·</span>
+              <span>{readingTime(featured.body)} min read</span>
+              {featured.data.tags && featured.data.tags.length > 0 && (
+                <>
+                  <span class="opacity-40">·</span>
+                  {featured.data.tags.slice(0, 3).map((tag: string) => (
+                    <span>#{tag}</span>
+                  ))}
+                </>
+              )}
+            </div>
+            <div class="absolute bottom-5 right-5 hidden text-text-muted transition-colors group-hover:text-accent sm:block">
+              <Icon name="arrow-up-right" size={18} class="arrow-slide" />
+            </div>
+          </a>
+        )}
+        */}
+
+        <div class="space-y-12">
+          {years.map((year) => (
+            <div>
+              {/* Year header — disabled while all posts are from a single year.
+                  Re-enable when posts span multiple years.
+              <div class="mb-4 flex items-center gap-3">
+                <span class="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-text-muted uppercase">
+                  {year}
+                </span>
+                <div class="h-px flex-1 bg-border"></div>
+                <span class="font-mono text-[0.7rem] tracking-[0.2em] text-text-muted uppercase">
+                  {byYear[year].length} posts
+                </span>
+              </div>
+              */}
+              <ol class="space-y-1">
+                {byYear[year].map((post) => (
+                  <li>
+                    <a
+                      href={`/writing/${post.id}`}
+                      data-writing-link
+                      class="group grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 py-3"
+                    >
+                      <p class="writing-title text-sm font-medium text-text-primary">
+                        {post.data.title}
+                      </p>
+                      <time class="font-mono text-xs text-text-muted tabular-nums">
+                        {fmtShort(post.data.date)}
+                      </time>
+                      <div class="col-span-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.7rem] text-text-muted">
+                        <span>{readingTime(post.body)} min read</span>
+                        {post.data.tags && post.data.tags.length > 0 && (
+                          <>
+                            <span class="opacity-40">·</span>
+                            {post.data.tags.slice(0, 3).map((tag: string) => (
+                              <span>#{tag}</span>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
           ))}
-        </ol>
+        </div>
       </>
     )}
   </section>
@@ -63,9 +139,9 @@ const fmt = (d: Date) =>
 
 <script>
   function install() {
-    const list = document.querySelector<HTMLOListElement>("[data-writing-list]");
-    if (!list) return;
-    const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>("li > a"));
+    const rows = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>("[data-writing-link]")
+    );
     if (rows.length === 0) return;
     let idx = -1;
 

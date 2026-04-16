@@ -51,9 +51,12 @@ const PAGE_LINKS = [
           item.span === 2 ? "sm:col-span-2" : "sm:col-span-1",
         ]}
       >
-        <div class="flex items-baseline gap-3">
-          <span class="font-mono text-[0.65rem] tracking-widest text-text-muted">{item.kicker}</span>
-          <span class="font-medium">{item.label}</span>
+        <div class="min-w-0 flex-1 sm:flex-none sm:w-auto">
+          <div class="flex items-baseline gap-3">
+            <span class="font-mono text-[0.65rem] tracking-widest text-text-muted">{item.kicker}</span>
+            <span class="font-medium">{item.label}</span>
+          </div>
+          <p class="mt-1 text-xs text-text-muted sm:hidden">{item.desc}</p>
         </div>
         <div class="flex items-center gap-2 sm:w-full sm:justify-between">
           <span class="hidden text-sm text-text-muted sm:block">{item.desc}</span>
@@ -69,11 +72,14 @@ const PAGE_LINKS = [
 
   <a
     href="/links"
-    class="animate-fade-in stagger-5 group card mt-3 flex items-center justify-between px-5 py-4 rounded"
+    class="animate-fade-in stagger-5 group card mt-3 flex items-center justify-between gap-4 px-5 py-4 rounded"
   >
-    <div class="flex items-baseline gap-3">
-      <span class="font-mono text-[0.65rem] tracking-widest text-text-muted">05</span>
-      <span class="font-medium">links</span>
+    <div class="min-w-0 flex-1 sm:flex-none">
+      <div class="flex items-baseline gap-3">
+        <span class="font-mono text-[0.65rem] tracking-widest text-text-muted">05</span>
+        <span class="font-medium">links</span>
+      </div>
+      <p class="mt-1 text-xs text-text-muted sm:hidden">find me around the internet</p>
     </div>
     <div class="flex items-center gap-3">
       <span class="text-sm text-text-muted hidden sm:block">find me around the internet</span>
