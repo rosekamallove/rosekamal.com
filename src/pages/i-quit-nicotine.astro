@@ -1,0 +1,60 @@
+---
+import "@/styles/global.css";
+import IQuitNicotineCounter from "@/components/islands/IQuitNicotineCounter.tsx";
+
+const title = "I Quit Nicotine — Rose Kamal Love";
+const description = "Live counter tracking how long it's been since I quit nicotine.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://rosekamal.com/i-quit-nicotine" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://rosekamal.com/og/i-quit-nicotine.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@rosekamallove" />
+    <meta name="twitter:image" content="https://rosekamal.com/og/i-quit-nicotine.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      (function () {
+        try {
+          const saved = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const isDark = saved ? saved === "dark" : prefersDark;
+          document.documentElement.classList.toggle("dark", isDark);
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen">
+    <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-16 bg-bg px-6">
+      <p class="font-mono text-[0.65rem] tracking-[0.3em] text-text-muted uppercase">
+        cigarette free for
+      </p>
+      <IQuitNicotineCounter client:load />
+      <p class="font-mono text-xs text-text-muted">
+        since mar 20, 2026 &middot; 2:00 am
+      </p>
+      <a
+        href="/"
+        class="group absolute bottom-8 font-mono text-xs text-text-muted transition-colors hover:text-text-primary"
+      >
+        <span class="inline-block transition-transform duration-200 group-hover:-translate-x-1">←</span>
+        back
+      </a>
+    </div>
+  </body>
+</html>

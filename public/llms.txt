@@ -1,0 +1,26 @@
+# Rose Kamal Love
+
+> Founder and product engineer based in Bengaluru, India. Product Lead at OptimizeCX (InstantDocs). Previously co-founded Kroto — raised $160K, launched #1 on Product Hunt, acquired.
+
+## About
+
+- Site: https://rosekamal.com
+- RSS: https://rosekamal.com/rss.xml
+- Sitemap: https://rosekamal.com/sitemap-index.xml
+
+## Key pages
+
+- [Home](https://rosekamal.com/): bio, contact, and jump links
+- [Work](https://rosekamal.com/work): experience and career history
+- [Projects](https://rosekamal.com/projects): things I've built
+- [Writing](https://rosekamal.com/writing): essays and thoughts on software, startups, and AI
+- [Outside work](https://rosekamal.com/outside): guitar, piano, photography
+- [Socials](https://rosekamal.com/links): all the places I'm online
+
+## Contact
+
+- Email: rosekamallove@gmail.com
+- X: https://x.com/rosekamallove
+- GitHub: https://github.com/rosekamallove
+- LinkedIn: https://www.linkedin.com/in/rose-kamal-love-1146141b0/
+- YouTube: https://www.youtube.com/@rosekamallove

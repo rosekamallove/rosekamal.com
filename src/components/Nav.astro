@@ -1,0 +1,66 @@
+---
+import ThemeToggle from "@/components/ThemeToggle.astro";
+
+const PAGE_LINKS = [
+  { label: "work", href: "/work" },
+  { label: "projects", href: "/projects" },
+  { label: "writing", href: "/writing" },
+  { label: "outside", href: "/outside" },
+];
+
+const SOCIALS_LINK = { label: "socials", href: "/links" };
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+---
+
+<nav class="mb-16 flex items-center justify-between">
+  <a
+    href="/"
+    class="group font-mono text-sm text-text-muted transition-colors hover:text-text-primary"
+    aria-label="Home"
+  >
+    <span class="inline-block transition-transform duration-300 ease-out group-hover:rotate-[-8deg]">rkl</span>
+  </a>
+  <div class="flex items-center gap-3 sm:gap-5">
+    {PAGE_LINKS.map((link) => (
+      <a
+        href={link.href}
+        class:list={[
+          "relative text-sm transition-colors",
+          isActive(link.href)
+            ? "text-text-primary"
+            : "text-text-secondary hover:text-text-primary",
+        ]}
+      >
+        {link.label}
+        {isActive(link.href) && (
+          <span
+            class="absolute left-0 right-0 -bottom-1 h-px bg-accent"
+            aria-hidden="true"
+          />
+        )}
+      </a>
+    ))}
+
+    <span class="hidden h-4 w-px bg-border sm:inline-block" aria-hidden="true"></span>
+
+    <a
+      href={SOCIALS_LINK.href}
+      class:list={[
+        "relative text-sm transition-colors",
+        isActive(SOCIALS_LINK.href)
+          ? "text-text-primary"
+          : "text-text-secondary hover:text-text-primary",
+      ]}
+    >
+      {SOCIALS_LINK.label}
+      {isActive(SOCIALS_LINK.href) && (
+        <span class="absolute left-0 right-0 -bottom-1 h-px bg-accent" aria-hidden="true" />
+      )}
+    </a>
+
+    <ThemeToggle />
+  </div>
+</nav>

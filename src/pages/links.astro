@@ -1,0 +1,65 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import Icon from "@/components/Icon.astro";
+
+type IconName = Parameters<typeof Icon>[0]["name"];
+
+const SOCIAL_LINKS: {
+  platform: string;
+  handle: string;
+  href: string;
+  icon: IconName;
+  span: number;
+}[] = [
+  {
+    platform: "YouTube",
+    handle: "@rosekamallove",
+    href: "https://www.youtube.com/@rosekamallove",
+    icon: "youtube",
+    span: 2,
+  },
+  { platform: "X", handle: "@rosekamallove", href: "https://x.com/rosekamallove", icon: "x", span: 1 },
+  { platform: "GitHub", handle: "@rosekamallove", href: "https://github.com/rosekamallove", icon: "github", span: 1 },
+  { platform: "LinkedIn", handle: "rose-kamal-love", href: "https://www.linkedin.com/in/rose-kamal-love-1146141b0/", icon: "linkedin", span: 1 },
+  { platform: "Instagram", handle: "@rosekamallove", href: "https://instagram.com/rosekamallove", icon: "instagram", span: 1 },
+  { platform: "Email", handle: "rosekamallove@gmail.com", href: "mailto:rosekamallove@gmail.com", icon: "mail", span: 3 },
+];
+---
+
+<BaseLayout title="Links" description="Find me around the internet.">
+  <section>
+    <SectionHeading label="links" />
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+      {SOCIAL_LINKS.map((link) => (
+        <a
+          href={link.href}
+          target={link.href.startsWith("mailto") ? undefined : "_blank"}
+          rel="noopener noreferrer"
+          class:list={[
+            "group card relative flex items-center justify-between gap-4 overflow-hidden rounded px-5 py-4 sm:min-h-32 sm:flex-col sm:items-start sm:justify-between sm:gap-0",
+            link.span === 3 ? "sm:col-span-3" : link.span === 2 ? "sm:col-span-2" : "sm:col-span-1",
+          ]}
+        >
+          <Icon
+            name={link.icon}
+            size={128}
+            class="absolute -bottom-8 -right-8 text-text-muted opacity-[0.06] group-hover:opacity-[0.14] transition-opacity"
+          />
+          <div class="relative z-10 flex items-center gap-3 sm:w-full sm:items-start sm:justify-between">
+            <Icon name={link.icon} size={16} class="text-accent" />
+            <div class="sm:hidden">
+              <p class="text-sm font-medium text-text-primary">{link.platform}</p>
+              <p class="font-mono text-xs text-text-muted">{link.handle}</p>
+            </div>
+            <Icon name="arrow-up-right" size={14} class="arrow-slide text-text-muted group-hover:text-accent sm:ml-auto" />
+          </div>
+          <div class="relative z-10 hidden sm:block">
+            <p class="text-sm font-medium text-text-primary group-hover:text-accent transition-colors">{link.platform}</p>
+            <p class="font-mono text-xs text-text-muted">{link.handle}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,87 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+
+const PAGE_LINKS = [
+  { href: "/work", label: "work", desc: "experience & career", span: 1, kicker: "01" },
+  { href: "/projects", label: "projects", desc: "things i've built", span: 2, kicker: "02" },
+  { href: "/writing", label: "writing", desc: "essays & thoughts", span: 2, kicker: "03" },
+  { href: "/outside", label: "outside work", desc: "guitar, piano, photography", span: 1, kicker: "04" },
+];
+---
+
+<BaseLayout>
+  <header class="mb-14">
+    <div class="animate-fade-in mb-4 flex items-center gap-2 text-sm text-text-secondary">
+      <Icon name="map-pin" size={14} />
+      <span>Bengaluru, India</span>
+      <span class="mx-1 text-text-muted">·</span>
+      <span class="inline-flex items-center gap-1.5">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
+        </span>
+        <span class="text-accent">available</span>
+      </span>
+    </div>
+
+    <h1 class="animate-fade-in stagger-1 mb-3 font-serif text-5xl leading-[1.05] tracking-tight sm:text-6xl">
+      Rose Kamal Love<span class="text-accent">.</span>
+    </h1>
+
+    <p class="animate-fade-in stagger-2 mb-5 font-mono text-xs tracking-widest uppercase text-text-muted">
+      Founder &middot; Builder
+    </p>
+
+    <p class="animate-fade-in stagger-3 max-w-lg text-[0.95rem] leading-relaxed text-text-secondary">
+      Product Lead at <span class="text-text-primary font-medium">OptimizeCX</span>,
+      working on InstantDocs. Previously co-founded{" "}
+      <span class="text-text-primary font-medium">Kroto</span> — raised $160K,
+      launched #1 on Product Hunt, and got acquired. I build software people
+      actually use.
+    </p>
+  </header>
+
+  <div class="animate-fade-in stagger-4 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+    {PAGE_LINKS.map((item) => (
+      <a
+        href={item.href}
+        class:list={[
+          "group card flex items-center justify-between gap-4 px-5 py-4 sm:flex-col sm:items-start sm:justify-start sm:gap-10 rounded",
+          item.span === 2 ? "sm:col-span-2" : "sm:col-span-1",
+        ]}
+      >
+        <div class="flex items-baseline gap-3">
+          <span class="font-mono text-[0.65rem] tracking-widest text-text-muted">{item.kicker}</span>
+          <span class="font-medium">{item.label}</span>
+        </div>
+        <div class="flex items-center gap-2 sm:w-full sm:justify-between">
+          <span class="hidden text-sm text-text-muted sm:block">{item.desc}</span>
+          <Icon
+            name="arrow-up-right"
+            size={15}
+            class="arrow-slide text-text-muted group-hover:text-accent"
+          />
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <a
+    href="/links"
+    class="animate-fade-in stagger-5 group card mt-3 flex items-center justify-between px-5 py-4 rounded"
+  >
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-[0.65rem] tracking-widest text-text-muted">05</span>
+      <span class="font-medium">links</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-sm text-text-muted hidden sm:block">find me around the internet</span>
+      <Icon
+        name="arrow-up-right"
+        size={15}
+        class="arrow-slide text-text-muted group-hover:text-accent"
+      />
+    </div>
+  </a>
+</BaseLayout>

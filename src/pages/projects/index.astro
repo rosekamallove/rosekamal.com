@@ -1,0 +1,89 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import ProjectRow from "@/components/ProjectRow.astro";
+
+type Status = "active" | "shipped" | "archived" | "acquired";
+type Project = {
+  name: string;
+  description: string;
+  url?: string;
+  slug?: string;
+  status: Status;
+  startDate: string;
+  endDate: string;
+};
+
+const EXPERIMENTS: Project[] = [
+  {
+    name: "Autonomous Email Reply Agent",
+    description:
+      "Reads inbound cold outreach replies, classifies intent, drafts a response, has another model peer-review the draft, then sends — no human in the loop.",
+    slug: "email-reply-agent",
+    status: "active",
+    startDate: "Mar 2026",
+    endDate: "Present",
+  },
+  {
+    name: "Startups With Funding",
+    description:
+      "Daily digest of startup funding announcements scraped from 15+ sources across US, Europe, and India — with founder contact enrichment. Fully autonomous pipeline running every weekday morning.",
+    slug: "startupswithfunding",
+    status: "active",
+    startDate: "Mar 2026",
+    endDate: "Present",
+  },
+  {
+    name: "YouTube",
+    description:
+      "Videos about building with AI — agents, real systems, and what actually works in production.",
+    url: "https://www.youtube.com/@rosekamallove",
+    status: "active",
+    startDate: "Jan 2026",
+    endDate: "Present",
+  },
+];
+
+const PAST: Project[] = [
+  {
+    name: "InstantDocs",
+    description:
+      "AI-powered platform that auto-generates professional video documentation and step-by-step guides from screen recordings. Launched on Product Hunt twice — ranked #4 and #1 for the day. 2,000+ guides created with ~100k views.",
+    slug: "instantdocs",
+    url: "https://app.instantdocs.com",
+    status: "acquired",
+    startDate: "Jun 2024",
+    endDate: "Jan 2025",
+  },
+  {
+    name: "Kroto",
+    description:
+      "AI course builder for creators — scaled to 500+ courses and 30 paying creators before pivoting to product documentation and getting acquired.",
+    slug: "kroto",
+    url: "https://www.youtube.com/watch?v=hIfsfV-pBBI",
+    status: "archived",
+    startDate: "May 2023",
+    endDate: "Jun 2024",
+  },
+];
+---
+
+<BaseLayout title="Projects" description="Things I've built.">
+  <section>
+    <SectionHeading label="projects" />
+    <div class="space-y-10">
+      <div>
+        <p class="mb-3 font-mono text-[0.7rem] tracking-[0.2em] text-text-muted uppercase">experiments</p>
+        <ul class="space-y-1">
+          {EXPERIMENTS.map((p) => <ProjectRow {...p} />)}
+        </ul>
+      </div>
+      <div>
+        <p class="mb-3 font-mono text-[0.7rem] tracking-[0.2em] text-text-muted uppercase">past</p>
+        <ul class="space-y-1">
+          {PAST.map((p) => <ProjectRow {...p} />)}
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

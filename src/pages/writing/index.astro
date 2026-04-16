@@ -1,0 +1,102 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+---
+
+<BaseLayout title="Writing" description="Essays and thoughts on building software, startups, and AI.">
+  <section>
+    <SectionHeading label="writing" kicker={`${posts.length} posts`} />
+
+    {posts.length === 0 ? (
+      <div class="rounded border border-border bg-bg-elev p-6">
+        <p class="text-sm leading-relaxed text-text-secondary">
+          No posts yet — but this is where they'll live.
+        </p>
+      </div>
+    ) : (
+      <>
+        <p class="mb-4 font-mono text-[0.7rem] tracking-[0.15em] text-text-muted uppercase">
+          <span class="inline-flex items-center gap-1.5">
+            <kbd class="rounded border border-border px-1 py-0.5 text-[0.6rem]">j</kbd>
+            <kbd class="rounded border border-border px-1 py-0.5 text-[0.6rem]">k</kbd>
+            <span>navigate</span>
+            <span class="opacity-40">·</span>
+            <kbd class="rounded border border-border px-1 py-0.5 text-[0.6rem]">↵</kbd>
+            <span>open</span>
+          </span>
+        </p>
+        <ol class="space-y-px" data-writing-list>
+          {posts.map((post) => (
+            <li>
+              <a
+                href={`/writing/${post.id}`}
+                class="group flex items-start justify-between gap-4 rounded border border-transparent px-5 py-4 transition-all hover:border-border-hover hover:bg-bg-card"
+              >
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-text-primary group-hover:text-accent transition-colors">
+                    {post.data.title}
+                  </p>
+                  {post.data.description && (
+                    <p class="mt-0.5 truncate text-xs text-text-muted">
+                      {post.data.description}
+                    </p>
+                  )}
+                </div>
+                <time class="shrink-0 pt-0.5 font-mono text-xs text-text-muted tabular-nums">
+                  {fmt(post.data.date)}
+                </time>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </>
+    )}
+  </section>
+</BaseLayout>
+
+<script>
+  function install() {
+    const list = document.querySelector<HTMLOListElement>("[data-writing-list]");
+    if (!list) return;
+    const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>("li > a"));
+    if (rows.length === 0) return;
+    let idx = -1;
+
+    function highlight(next: number) {
+      rows.forEach((r) => r.classList.remove("kb-selected"));
+      if (next >= 0 && next < rows.length) {
+        rows[next].classList.add("kb-selected");
+        rows[next].scrollIntoView({ block: "nearest" });
+      }
+      idx = next;
+    }
+
+    function onKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+
+      if (e.key === "j") { e.preventDefault(); highlight(Math.min(idx + 1, rows.length - 1)); }
+      else if (e.key === "k") { e.preventDefault(); highlight(Math.max(idx - 1, 0)); }
+      else if (e.key === "Enter" && idx >= 0) {
+        e.preventDefault();
+        rows[idx].click();
+      }
+    }
+
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("astro:before-swap", () => {
+      document.removeEventListener("keydown", onKey);
+    }, { once: true });
+  }
+
+  install();
+  document.addEventListener("astro:page-load", install);
+</script>

@@ -1,0 +1,109 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Not found" description="This page doesn't exist.">
+  <section class="py-20">
+    <p class="font-mono text-[0.7rem] tracking-[0.2em] text-text-muted uppercase">
+      error · 404
+    </p>
+
+    <h1 class="mt-4 font-serif text-6xl leading-[1.05] tracking-tight sm:text-7xl">
+      This page <span class="text-accent">doesn't</span> exist<span class="text-accent">.</span>
+    </h1>
+
+    <p class="mt-6 max-w-md text-[0.95rem] leading-relaxed text-text-secondary">
+      You've found a dead link. Probably my fault — the URL might have changed, or the
+      page never existed at all. Either way, you're here now.
+    </p>
+
+    <div class="mt-10 rounded border border-border bg-bg-elev p-4 font-mono text-sm">
+      <p class="text-text-muted">
+        <span class="text-accent">rkl@rosekamal.com</span>:<span class="text-text-secondary">~$</span>
+        <span data-typewriter data-text="cd /"></span><span class="typewriter-caret">▋</span>
+      </p>
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-2">
+      <a href="/" class="card group inline-flex items-center gap-2 rounded px-4 py-2.5 text-sm">
+        <span>go home</span>
+        <span class="arrow-slide text-text-muted group-hover:text-accent">→</span>
+      </a>
+      <a href="/writing" class="card group inline-flex items-center gap-2 rounded px-4 py-2.5 text-sm">
+        <span>read something</span>
+        <span class="arrow-slide text-text-muted group-hover:text-accent">→</span>
+      </a>
+      <button
+        type="button"
+        data-open-palette
+        class="card inline-flex items-center gap-2 rounded px-4 py-2.5 text-sm"
+      >
+        <span>search</span>
+        <span class="font-mono text-xs text-text-muted">⌘K</span>
+      </button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .typewriter-caret {
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    color: var(--accent);
+    margin-left: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+</style>
+
+<script>
+  function install() {
+    const el = document.querySelector<HTMLElement>("[data-typewriter]");
+    if (!el) return;
+    const target = el.dataset.text ?? "";
+    const options = [
+      "cd /",
+      "ls -la ~/",
+      "whoami",
+      "find . -name 'page'",
+      "exit",
+    ];
+    let i = 0;
+    let charIdx = 0;
+    let mode: "typing" | "pausing" | "erasing" = "typing";
+    el.textContent = "";
+
+    function tick() {
+      if (!el) return;
+      const current = options[i];
+      if (mode === "typing") {
+        el.textContent = current.slice(0, ++charIdx);
+        if (charIdx === current.length) {
+          mode = "pausing";
+          setTimeout(tick, 1400);
+          return;
+        }
+      } else if (mode === "pausing") {
+        mode = "erasing";
+      } else {
+        el.textContent = current.slice(0, --charIdx);
+        if (charIdx === 0) {
+          mode = "typing";
+          i = (i + 1) % options.length;
+        }
+      }
+      setTimeout(tick, mode === "typing" ? 85 : mode === "erasing" ? 40 : 700);
+    }
+
+    tick();
+
+    const btn = document.querySelector<HTMLButtonElement>("[data-open-palette]");
+    btn?.addEventListener("click", () => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true, bubbles: true })
+      );
+    });
+  }
+
+  install();
+  document.addEventListener("astro:page-load", install);
+</script>
