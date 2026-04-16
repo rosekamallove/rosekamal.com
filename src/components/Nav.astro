@@ -23,12 +23,12 @@ const isActive = (href: string) =>
   >
     <span class="inline-block transition-transform duration-300 ease-out group-hover:rotate-[-8deg]">rkl</span>
   </a>
-  <div class="flex items-center gap-3 sm:gap-5">
+  <div class="flex items-center gap-2.5 sm:gap-5">
     {PAGE_LINKS.map((link) => (
       <a
         href={link.href}
         class:list={[
-          "relative text-sm transition-colors",
+          "relative text-[0.85rem] sm:text-sm transition-colors",
           isActive(link.href)
             ? "text-text-primary"
             : "text-text-secondary hover:text-text-primary",
@@ -49,7 +49,7 @@ const isActive = (href: string) =>
     <a
       href={SOCIALS_LINK.href}
       class:list={[
-        "relative text-sm transition-colors",
+        "relative hidden text-sm transition-colors sm:inline-block",
         isActive(SOCIALS_LINK.href)
           ? "text-text-primary"
           : "text-text-secondary hover:text-text-primary",

@@ -346,6 +346,11 @@ pre[data-theme] {
     opacity: 1;
     color: var(--accent);
   }
+  /* Touch devices: hide the anchor entirely (no hover to reveal, and
+     there's no need to copy a URL hash mid-read on mobile). */
+  @media (hover: none) {
+    & .heading-anchor { display: none; }
+  }
 }
 
 /* ── Code block chrome: copy button ──────────────────────────────────── */
@@ -372,6 +377,11 @@ figure[data-rehype-pretty-code-figure]:hover .code-copy,
 .code-copy:focus-visible {
   opacity: 1;
 }
+/* Touch devices: always-visible (hover doesn't exist on phones) */
+@media (hover: none) {
+  .code-copy { opacity: 0.7; }
+  .code-copy:active { opacity: 1; }
+}
 .code-copy:hover {
   color: var(--accent);
   border-color: var(--accent);
@@ -395,9 +405,12 @@ figure[data-rehype-pretty-code-figure]:hover .code-copy,
   background: color-mix(in oklab, var(--bg) 85%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 3rem;
+  padding: 1rem;
   animation: fade-in-slow 0.25s var(--ease-out-expo) both;
   cursor: zoom-out;
+}
+@media (min-width: 640px) {
+  .mermaid-modal { padding: 3rem; }
 }
 .mermaid-modal svg {
   width: min(100%, 1400px);
@@ -495,6 +508,14 @@ figure[data-rehype-pretty-code-figure]:hover .code-copy,
   background: var(--bg-card) !important;
   border-color: var(--border-hover) !important;
 }
+
+/* ── Collapsible mobile TOC ──────────────────────────────────────────── */
+.toc-mobile > summary {
+  outline: none;
+}
+.toc-mobile > summary::-webkit-details-marker { display: none; }
+.toc-mobile[open] > summary .toc-chevron { transform: rotate(180deg); }
+.toc-mobile > summary:hover { color: var(--text-secondary); }
 
 /* ── Reading progress bar (top of article pages) ──────────────────────── */
 .read-progress {

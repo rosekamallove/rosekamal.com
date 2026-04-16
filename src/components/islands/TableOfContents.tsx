@@ -104,27 +104,40 @@ export default function TableOfContents({ entries, title, slug, variant }: Props
 
   if (variant === "mobile") {
     return (
-      <nav
-        aria-label="Table of contents"
-        className="mb-10 rounded border border-border bg-bg-elev px-5 py-4 lg:hidden"
-      >
-        <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-[0.2em] text-text-muted uppercase">
-          on this page
-        </p>
-        <ol className="space-y-1.5">
-          {entries.map((e) => (
-            <li key={e.slug} style={{ paddingLeft: e.depth === 3 ? "1rem" : 0 }}>
-              <a
-                href={`#${e.slug}`}
-                className="text-sm text-text-secondary transition-colors hover:text-accent"
-              >
-                {e.text}
-              </a>
-            </li>
-          ))}
-        </ol>
-        <ShareLinks title={title} slug={slug} />
-      </nav>
+      <details className="toc-mobile mb-8 rounded border border-border bg-bg-elev lg:hidden">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-[0.7rem] font-medium tracking-[0.2em] text-text-muted uppercase">
+          <span className="font-mono">on this page · {entries.length}</span>
+          <svg
+            className="toc-chevron h-3 w-3 transition-transform duration-200"
+            viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth={2}
+            strokeLinecap="round" strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </summary>
+        <nav aria-label="Table of contents" className="px-5 pb-4">
+          <ol className="space-y-1.5">
+            {entries.map((e) => (
+              <li key={e.slug} style={{ paddingLeft: e.depth === 3 ? "1rem" : 0 }}>
+                <a
+                  href={`#${e.slug}`}
+                  className="text-sm text-text-secondary transition-colors hover:text-accent"
+                  onClick={(ev) => {
+                    // Close the details after navigation
+                    const details = (ev.currentTarget.closest("details") as HTMLDetailsElement | null);
+                    if (details) details.open = false;
+                  }}
+                >
+                  {e.text}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <ShareLinks title={title} slug={slug} />
+        </nav>
+      </details>
     );
   }
 
