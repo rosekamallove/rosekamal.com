@@ -1,0 +1,44 @@
+---
+// Injects a copy button into each rehype-pretty-code figure on article pages.
+// Re-runs on Astro view transitions via astro:page-load.
+---
+
+<script>
+  function install() {
+    const figures = document.querySelectorAll<HTMLElement>(
+      "figure[data-rehype-pretty-code-figure]"
+    );
+    figures.forEach((fig) => {
+      if (fig.querySelector(".code-copy")) return;
+      const pre = fig.querySelector("pre");
+      if (!pre) return;
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "code-copy";
+      btn.textContent = "copy";
+      btn.setAttribute("aria-label", "Copy code to clipboard");
+
+      btn.addEventListener("click", async () => {
+        const code = pre.innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+          btn.textContent = "copied";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = "copy";
+            btn.classList.remove("copied");
+          }, 1400);
+        } catch {
+          btn.textContent = "err";
+          setTimeout(() => (btn.textContent = "copy"), 1400);
+        }
+      });
+
+      fig.appendChild(btn);
+    });
+  }
+
+  install();
+  document.addEventListener("astro:page-load", install);
+</script>

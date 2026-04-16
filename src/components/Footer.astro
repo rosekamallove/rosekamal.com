@@ -1,0 +1,32 @@
+---
+const year = new Date().getFullYear();
+
+const SOCIAL = [
+  { href: "https://www.linkedin.com/in/rose-kamal-love-1146141b0/", label: "linkedin" },
+  { href: "https://x.com/rosekamallove", label: "x" },
+  { href: "https://github.com/rosekamallove", label: "github" },
+  { href: "https://www.youtube.com/@rosekamallove", label: "youtube" },
+];
+---
+
+<footer class="mt-24 border-t border-border pt-8 pb-2">
+  <div class="flex flex-col-reverse items-start justify-between gap-6 sm:flex-row sm:items-center">
+    <p class="font-mono text-xs text-text-muted">
+      Rose Kamal Love &middot; {year}
+    </p>
+    <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+      {SOCIAL.map((s) => (
+        <li>
+          <a
+            href={s.href}
+            target={s.href.startsWith("http") ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            class="link-hover font-mono text-xs text-text-muted hover:text-text-primary transition-colors"
+          >
+            {s.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</footer>

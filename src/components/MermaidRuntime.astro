@@ -1,0 +1,102 @@
+---
+// Renders all [data-mermaid] divs on the page, re-renders on theme switch,
+// and opens a fullscreen modal on click with ESC/backdrop to close.
+---
+
+<script>
+  async function run() {
+    const nodes = document.querySelectorAll<HTMLElement>("[data-mermaid]");
+    if (nodes.length === 0) return;
+
+    const { default: mermaid } = await import("mermaid");
+
+    function currentTheme(): "dark" | "default" {
+      return document.documentElement.classList.contains("dark") ? "dark" : "default";
+    }
+
+    function renderAll() {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: currentTheme(),
+        themeVariables: { fontFamily: "JetBrains Mono, ui-monospace, monospace" },
+      });
+      nodes.forEach(async (el, i) => {
+        const chart = el.dataset.chart ?? "";
+        if (!chart) return;
+        try {
+          const { svg } = await mermaid.render(
+            `mermaid-${i}-${Date.now()}`,
+            chart.trim()
+          );
+          el.innerHTML = svg;
+        } catch (e) {
+          el.innerHTML = `<pre style="color: var(--text-muted); font-size: 0.8rem;">${String(e)}</pre>`;
+        }
+      });
+    }
+
+    renderAll();
+
+    const observer = new MutationObserver(renderAll);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    // Click-to-zoom modal
+    function openModal(sourceEl: HTMLElement) {
+      const svg = sourceEl.querySelector("svg");
+      if (!svg) return;
+
+      const modal = document.createElement("div");
+      modal.className = "mermaid-modal";
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-label", "Enlarged diagram");
+
+      const clone = svg.cloneNode(true) as SVGElement;
+      // Drop inline width/height so the CSS can size it responsively
+      clone.removeAttribute("width");
+      clone.removeAttribute("height");
+      clone.style.width = "";
+      clone.style.height = "";
+      modal.appendChild(clone);
+
+      const close = document.createElement("button");
+      close.type = "button";
+      close.className = "mermaid-modal-close";
+      close.textContent = "esc";
+      close.setAttribute("aria-label", "Close");
+      modal.appendChild(close);
+
+      const dispose = () => {
+        modal.remove();
+        document.removeEventListener("keydown", onKey);
+        document.body.style.overflow = "";
+      };
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") dispose();
+      };
+      modal.addEventListener("click", dispose);
+      close.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dispose();
+      });
+      document.addEventListener("keydown", onKey);
+      document.body.style.overflow = "hidden";
+      document.body.appendChild(modal);
+    }
+
+    nodes.forEach((el) => {
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("role", "button");
+      el.setAttribute("aria-label", "Zoom diagram");
+      el.addEventListener("click", () => openModal(el));
+      el.addEventListener("keydown", (e) => {
+        if ((e as KeyboardEvent).key === "Enter") openModal(el);
+      });
+    });
+  }
+
+  run();
+  document.addEventListener("astro:page-load", run);
+</script>

@@ -1,0 +1,54 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import Icon from "@/components/Icon.astro";
+
+const HOBBIES = [
+  {
+    icon: "guitar" as const,
+    label: "Guitar",
+    note: "acoustic & electric",
+    description:
+      "About six months in. Barre chords finally clicked — felt like unlocking a new level. Still rough around the edges but getting there.",
+  },
+  {
+    icon: "piano" as const,
+    label: "Piano",
+    note: "learning",
+    description:
+      "Over a year in. Can get through a few scales without falling apart. Slower progress than expected, but it's satisfying in a way coding rarely is.",
+  },
+  {
+    icon: "camera" as const,
+    label: "Photography",
+    note: "street & landscape",
+    description:
+      "Shoot mostly on the street and on trips. Interested in light, composition, and catching moments before they pass.",
+  },
+];
+---
+
+<BaseLayout title="Outside Work" description="What I do when I'm not building software.">
+  <section>
+    <SectionHeading label="outside work" />
+    <ul class="space-y-3">
+      {HOBBIES.map((h) => (
+        <li class="group card relative overflow-hidden rounded px-5 py-4">
+          <Icon
+            name={h.icon}
+            size={96}
+            class="absolute -bottom-6 -right-6 text-text-muted opacity-[0.04] group-hover:opacity-[0.08] transition-opacity"
+          />
+          <div class="relative mb-2 flex items-center gap-2">
+            <Icon name={h.icon} size={16} class="text-accent" />
+            <span class="font-medium">{h.label}</span>
+            <span class="font-mono text-xs text-text-muted">{h.note}</span>
+          </div>
+          <p class="relative text-sm leading-relaxed text-text-secondary">
+            {h.description}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
