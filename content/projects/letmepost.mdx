@@ -1,0 +1,80 @@
+---
+title: "letmepost.dev"
+description: "Open-source social media publishing API that fails loudly. One POST across every platform with stable error codes, the rule that failed, and a remediation — never an empty error body."
+startDate: "Apr 2026"
+endDate: "Present"
+status: "active"
+stack: ["TypeScript", "Hono", "BullMQ", "Drizzle", "PostgreSQL", "Redis", "better-auth", "Zod", "Next.js", "Astro", "Turborepo"]
+url: "https://letmepost.dev"
+---
+
+A single `POST /v1/posts` across Bluesky, LinkedIn, X, Threads, Instagram, Facebook, Pinterest, and YouTube. The pitch is that every failure comes back with a stable error code, the specific rule that failed, the raw platform body, and a remediation hint — never an empty `{ body: {} }`. An alternative to Ayrshare, Postiz, Buffer, Hootsuite, and Hypefury, with no per-profile pricing.
+
+## The four guarantees on every request
+
+1. **Preflight, not postflight.** Character counts, media formats, URN patterns, audit states, OAuth scope mismatches, YouTube quota — all validated locally before the upstream call.
+2. **Transparent errors.** Stable letmepost code + the rule that failed + the raw platform body + a remediation hint. Always.
+3. **Pinned platform versions.** We pin the header, track deprecations, upgrade internally. Workflows don't break at 2 a.m. when LinkedIn sunsets v202412.
+4. **Idempotency by default.** Every write accepts an `Idempotency-Key`. Retries are safe — no double-posting loops when a worker restarts mid-publish.
+
+## What a failure looks like
+
+```json
+{
+  "error": {
+    "code": "preflight_failed",
+    "rule": "bluesky.text.max_graphemes",
+    "platform": "bluesky",
+    "platform_version": "atproto-2026-04",
+    "message": "Post text is 312 graphemes; Bluesky allows at most 300.",
+    "remediation": "Shorten the post to 300 graphemes or fewer.",
+    "request_id": "req_01HY6X4AWBJM2K9F2PTQMRD9JQ"
+  }
+}
+```
+
+Same shape across every platform. Same shape on every error class — `preflight_failed`, `platform_auth_failed`, `platform_rejected`, `platform_unavailable`, `rate_limited`. The dashboard renders these directly. The error handler doesn't need a per-platform branch.
+
+## Why this exists
+
+Four things developers hit every week with incumbent social-media APIs:
+
+1. **Silent failures.** Posts report success then never appear. Error bodies come back as `{}`. Postiz had an infinite double-post loop in production; Ayrshare's error 138 masks half a dozen distinct upstream causes.
+2. **API version churn.** LinkedIn sunset five API versions in six months in 2024–2025; every sunset broke n8n Cloud, Zapier, Make, Pabbly, and Postiz. The fix in every case was a one-header swap.
+3. **Async media rejections.** YouTube's restricted-scope mismatches surfacing as generic `forbidden`, Threads's `OAuthException 2207052`, Instagram Reels rejecting Google Drive URLs — all catchable client-side, all unhandled by the incumbents.
+4. **Per-profile pricing.** $6–$12 per channel, per month, forever. Universally hated; nobody has built around it. We don't charge it.
+
+## Platform support
+
+| Platform | Status | Notes |
+|---|---|---|
+| Bluesky | live | App-password auth, video via dedicated transcoder, 300-grapheme preflight |
+| X / Twitter | trial | OAuth 2.0 PKCE, 280 graphemes (t.co-aware), 4 images OR 1 video, threads & quote tweets |
+| Pinterest | trial | v5 API, image + video pins, board-required preflight |
+| LinkedIn | pending | Versioned REST, 3,000-grapheme commentary, MDP-gated for org posts |
+| Threads | pending | Standalone OAuth at threads.net, 500-char, 2–20 mixed-media carousels |
+| Instagram | pending | Meta Graph, Reels + carousels, FB Login fan-out |
+| Facebook Pages | pending | Meta Graph, single video OR 10 photos |
+| YouTube | planned | Data API v3, CASA-gated for production verification |
+
+TikTok is deferred to v2 — schemas + DB enum keep it reserved so the v2 add is additive. Reddit, Telegram, Discord, Snapchat, Google Business, and WhatsApp are deliberately cut from v1.
+
+## Open source from day zero
+
+Apache 2.0. Same code runs the hosted SaaS and the self-host Docker Compose — no feature gate, no open-core trick. BYO Postgres, BYO Redis, BYO platform credentials. Hosted is permanently optional.
+
+```bash
+git clone https://github.com/rosekamallove/letmepost.dev
+cd letmepost.dev
+cp apps/api/.env.example apps/api/.env
+docker compose up
+```
+
+## Compliance posture
+
+- Official, platform-approved OAuth flows on every platform (Bluesky app-password is the documented Bluesky-supported alternative; everything else is OAuth 2.0 or OAuth 2.0 + PKCE).
+- No scraping — every read and write is through the platform's documented API.
+- We don't collect, store, or proxy end-user API keys. Users authenticate directly with the platform; tokens are AES-256-GCM encrypted at rest with per-row data keys.
+- Self-host has no telemetry, no license check, no phone-home.
+
+→ [letmepost.dev](https://letmepost.dev) · [docs.letmepost.dev](https://docs.letmepost.dev) · [github.com/rosekamallove/letmepost.dev](https://github.com/rosekamallove/letmepost.dev)

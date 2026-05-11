@@ -3,7 +3,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import SectionHeading from "@/components/SectionHeading.astro";
 import ProjectRow from "@/components/ProjectRow.astro";
 
-type Status = "active" | "shipped" | "archived" | "acquired";
+type Status = "active" | "paused" | "shipped" | "archived" | "acquired";
 type Project = {
   name: string;
   description: string;
@@ -16,21 +16,13 @@ type Project = {
 
 const EXPERIMENTS: Project[] = [
   {
-    name: "Autonomous Email Reply Agent",
+    name: "letmepost.dev",
     description:
-      "Reads inbound cold outreach replies, classifies intent, drafts a response, has another model peer-review the draft, then sends — no human in the loop.",
-    slug: "email-reply-agent",
+      "Open-source social media publishing API that fails loudly. One POST across every platform with stable error codes, the rule that failed, and a remediation — never an empty error body. Alternative to Ayrshare, Postiz, and Buffer with no per-profile pricing.",
+    slug: "letmepost",
+    url: "https://letmepost.dev",
     status: "active",
-    startDate: "Mar 2026",
-    endDate: "Present",
-  },
-  {
-    name: "Startups With Funding",
-    description:
-      "Daily digest of startup funding announcements scraped from 15+ sources across US, Europe, and India — with founder contact enrichment. Fully autonomous pipeline running every weekday morning.",
-    slug: "startupswithfunding",
-    status: "active",
-    startDate: "Mar 2026",
+    startDate: "Apr 2026",
     endDate: "Present",
   },
   {
@@ -40,6 +32,24 @@ const EXPERIMENTS: Project[] = [
     url: "https://www.youtube.com/@rosekamallove",
     status: "active",
     startDate: "Jan 2026",
+    endDate: "Present",
+  },
+  {
+    name: "Autonomous Email Reply Agent",
+    description:
+      "Reads inbound cold outreach replies, classifies intent, drafts a response, has another model peer-review the draft, then sends — no human in the loop.",
+    slug: "email-reply-agent",
+    status: "paused",
+    startDate: "Mar 2026",
+    endDate: "Present",
+  },
+  {
+    name: "Startups With Funding",
+    description:
+      "Daily digest of startup funding announcements scraped from 15+ sources across US, Europe, and India — with founder contact enrichment. Fully autonomous pipeline running every weekday morning.",
+    slug: "startupswithfunding",
+    status: "paused",
+    startDate: "Mar 2026",
     endDate: "Present",
   },
 ];

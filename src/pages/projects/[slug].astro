@@ -8,7 +8,7 @@ import MermaidDiagram from "@/components/islands/MermaidDiagram.tsx";
 import MermaidRuntime from "@/components/MermaidRuntime.astro";
 import CodeCopyRuntime from "@/components/CodeCopyRuntime.astro";
 
-type Status = "active" | "shipped" | "archived" | "acquired";
+type Status = "active" | "paused" | "shipped" | "archived" | "acquired";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects", ({ data }) => !data.draft);
@@ -24,6 +24,7 @@ const toc: TocEntry[] = headings
 
 const STATUS_CLASS: Record<Status, string> = {
   active:   "text-accent bg-accent-soft",
+  paused:   "text-text-secondary bg-bg-card-hover",
   shipped:  "text-text-secondary bg-bg-card-hover",
   archived: "text-text-muted bg-bg-card-hover",
   acquired: "text-text-muted bg-bg-card-hover",

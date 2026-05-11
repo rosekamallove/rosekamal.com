@@ -1,7 +1,7 @@
 ---
 import Icon from "@/components/Icon.astro";
 
-type Status = "active" | "shipped" | "archived" | "acquired";
+type Status = "active" | "paused" | "shipped" | "archived" | "acquired";
 
 interface Props {
   name: string;
@@ -17,6 +17,7 @@ const { name, description, url, slug, status, startDate, endDate } = Astro.props
 
 const STATUS_CLASS: Record<Status, string> = {
   active:   "text-accent bg-accent-soft",
+  paused:   "text-text-secondary bg-bg-card-hover",
   shipped:  "text-text-secondary bg-bg-card-hover",
   archived: "text-text-muted bg-bg-card-hover",
   acquired: "text-text-muted bg-bg-card-hover",
