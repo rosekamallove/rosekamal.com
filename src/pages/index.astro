@@ -15,13 +15,11 @@ const PAGE_LINKS = [
     <div class="animate-fade-in mb-4 flex items-center gap-2 text-sm text-text-secondary">
       <Icon name="map-pin" size={14} />
       <span>Bengaluru, India</span>
-      <span class="mx-1 text-text-muted">·</span>
-      <span class="inline-flex items-center gap-1.5">
-        <span class="relative flex h-2 w-2">
-          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
-          <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
+      <span class="inline-flex items-center gap-1.5 font-mono text-[0.8rem]" aria-hidden="true">
+        <span id="thinking-spinner" class="thinking-spinner">✻</span>
+        <span class="inline-flex items-baseline">
+          <span id="thinking-word" class="thinking-word">Lollygagging</span><span class="thinking-ellipsis">…</span>
         </span>
-        <span class="text-accent">available</span>
       </span>
     </div>
 
@@ -34,8 +32,9 @@ const PAGE_LINKS = [
     </p>
 
     <p class="animate-fade-in stagger-3 max-w-lg text-[0.95rem] leading-relaxed text-text-secondary">
-      Product Lead at <span class="text-text-primary font-medium">OptimizeCX</span>,
-      working on InstantDocs. Previously co-founded{" "}
+      Product Engineer at{" "}
+      <a href="https://helply.com" target="_blank" rel="noopener noreferrer" class="text-text-primary font-medium hover:text-accent transition-colors">Helply</a>.
+      Previously co-founded{" "}
       <span class="text-text-primary font-medium">Kroto</span> — raised $160K,
       launched #1 on Product Hunt, and got acquired. I build software people
       actually use.
@@ -91,3 +90,38 @@ const PAGE_LINKS = [
     </div>
   </a>
 </BaseLayout>
+
+<script>
+  const WORDS = [
+    "Booping",
+    "Canoodling",
+    "Dilly-dallying",
+    "Flibbertigibbeting",
+    "Lollygagging",
+    "Razzle-dazzling",
+    "Shenaniganing",
+    "Tomfoolering",
+    "Topsy-turvying",
+    "Whatchamacalliting",
+  ];
+  const SPINNER = ["·", "✢", "✳", "✶", "✻", "✽"];
+
+  const wordEl = document.getElementById("thinking-word");
+  const spinEl = document.getElementById("thinking-spinner");
+
+  if (wordEl && spinEl) {
+    let wi = Math.floor(Math.random() * WORDS.length);
+    let si = 0;
+    wordEl.textContent = WORDS[wi];
+
+    setInterval(() => {
+      si = (si + 1) % SPINNER.length;
+      spinEl.textContent = SPINNER[si];
+    }, 130);
+
+    setInterval(() => {
+      wi = (wi + 1) % WORDS.length;
+      wordEl.textContent = WORDS[wi];
+    }, 2800);
+  }
+</script>

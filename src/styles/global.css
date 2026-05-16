@@ -540,6 +540,38 @@ figure[data-rehype-pretty-code-figure]:hover .code-copy,
 .toc-mobile[open] > summary .toc-chevron { transform: rotate(180deg); }
 .toc-mobile > summary:hover { color: var(--text-secondary); }
 
+/* ── Claude-Code-style thinking spinner ──────────────────────────────── */
+@keyframes thinking-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.thinking-word {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--accent) 55%, transparent) 0%,
+    color-mix(in oklab, var(--accent) 55%, transparent) 35%,
+    var(--accent) 50%,
+    color-mix(in oklab, var(--accent) 55%, transparent) 65%,
+    color-mix(in oklab, var(--accent) 55%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: thinking-shimmer 2.4s linear infinite;
+}
+.thinking-spinner {
+  display: inline-block;
+  width: 0.9em;
+  text-align: center;
+  color: var(--accent);
+}
+.thinking-ellipsis {
+  color: color-mix(in oklab, var(--accent) 55%, transparent);
+  margin-left: 1px;
+}
+
 /* ── Reading progress bar (top of article pages) ──────────────────────── */
 .read-progress {
   position: fixed;
